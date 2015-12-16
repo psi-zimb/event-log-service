@@ -5,7 +5,7 @@
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
     <changeSet author="Hemanth/ShruthiP" id="201512161533">
-        <createTable tableName="events_log" schemaName="public">
+        <createTable tableName="events_log">
             <column name="id" type="int">
                 <constraints primaryKey="true"/>
             </column>
@@ -16,4 +16,29 @@
             <column name="filter" type="varchar(255)"/>
         </createTable>
     </changeSet>
+    <changeSet id="201512161630" author="Shruthi, Hemanth">
+        <comment>Creating quartz cron scheduler Table</comment>
+        <createTable tableName="quartz_cron_scheduler">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="boolean" defaultValue="true">
+            </column>
+            <column name="cron_statement" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_delay" type="int">
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="201512161647" author="Hemanth / ShruthiP">
+        <comment>Adding schedulers to publish event log</comment>
+        <sql>
+            insert into quartz_cron_scheduler (name, cron_statement, start_delay, enabled) values ('eventLogPublisherJob', '0/15 * * * * ?', 0, true);
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
