@@ -51,6 +51,7 @@ public class ScheduledTasks implements SchedulingConfigurer {
             jobs.put(quartzCronScheduler.getName(), ((Job) applicationContext.getBean(quartzCronScheduler.getName())));
 
             try {
+                logger.debug("Scheduling job to copy events from event_records to events_log table.");
                 taskRegistrar.setScheduler(taskExecutor());
                 taskRegistrar.addTriggerTask(getTask(quartzCronScheduler), getTrigger(quartzCronScheduler));
             } catch (ParseException e) {
@@ -75,7 +76,9 @@ public class ScheduledTasks implements SchedulingConfigurer {
             public void run() {
                 Job job = jobs.get(quartzCronScheduler.getName());
                 try {
+                    logger.debug("Copying events from event_records to events_log table at: " + new Date());
                     job.process();
+                    logger.debug("Done.");
                 } catch (InterruptedException e) {
                     logger.warn("Thread interrupted for the job: " + quartzCronScheduler.getName());
                 }

@@ -37,7 +37,7 @@
     <changeSet id="201512161647" author="Hemanth / ShruthiP">
         <comment>Adding schedulers to publish event log</comment>
         <sql>
-            insert into quartz_cron_scheduler (name, cron_statement, start_delay, enabled) values ('eventLogPublisherJob', '0/15 * * * * ?', 0, true);
+            insert into quartz_cron_scheduler (name, cron_statement, start_delay, enabled) values ('eventLogPublisherJob', '0 0/1 * * * ?', 0, true);
         </sql>
     </changeSet>
 
