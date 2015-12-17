@@ -1,0 +1,1 @@
+INSERT INTO event_records (uuid,title,timestamp,uri,object,category) values ('new uuid', 'patient', '2015-08-15 12:36:22.0', 'uri', 'object', 'category');
