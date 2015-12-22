@@ -10,6 +10,7 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,9 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @EnableAutoConfiguration
 @SpringBootApplication
-@ComponentScan(basePackages = "org.bahmni.module.*")
+@ComponentScan({"org.openmrs.api", "org.bahmni.module"})
 @EnableTransactionManagement
-@Import({ LiquibaseAutoConfiguration.class})
+@Import({LiquibaseAutoConfiguration.class})
+@ImportResource({"classpath*:applicationContext-service.xml"})
 public class OfflineService extends SpringBootServletInitializer {
 
     @RequestMapping("/")
