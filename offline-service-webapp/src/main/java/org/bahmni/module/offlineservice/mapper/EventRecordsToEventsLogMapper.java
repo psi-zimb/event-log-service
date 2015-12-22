@@ -5,6 +5,9 @@ import org.bahmni.module.offlineservice.mapper.filterEvaluators.FilterEvaluator;
 import org.bahmni.module.offlineservice.mapper.filterEvaluators.PatientFilterEvaluator;
 import org.bahmni.module.offlineservice.model.EventRecords;
 import org.bahmni.module.offlineservice.model.EventsLog;
+import org.openmrs.api.EncounterService;
+import org.openmrs.api.PatientService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

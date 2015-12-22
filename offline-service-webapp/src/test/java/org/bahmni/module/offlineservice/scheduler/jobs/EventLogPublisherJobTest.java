@@ -23,7 +23,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EventLogPublisherJobTest {
     @InjectMocks
-    private EventLogPublisherJob eventLogPublisherJob = new EventLogPublisherJob();
+    private Job eventLogPublisherJob = new EventLogPublisherJob();
 
     @Mock
     private EventRecordsRepository eventRecordsRepository;
