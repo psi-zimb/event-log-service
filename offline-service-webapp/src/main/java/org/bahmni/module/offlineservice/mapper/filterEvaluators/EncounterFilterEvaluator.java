@@ -4,7 +4,9 @@ import org.bahmni.module.offlineservice.model.EventsLog;
 import org.openmrs.Encounter;
 import org.openmrs.api.EncounterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class EncounterFilterEvaluator implements FilterEvaluator {
     private final EncounterService encounterService;
 

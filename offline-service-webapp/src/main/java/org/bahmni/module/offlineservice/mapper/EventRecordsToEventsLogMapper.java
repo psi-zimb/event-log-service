@@ -5,7 +5,6 @@ import org.bahmni.module.offlineservice.mapper.filterEvaluators.FilterEvaluator;
 import org.bahmni.module.offlineservice.mapper.filterEvaluators.PatientFilterEvaluator;
 import org.bahmni.module.offlineservice.model.EventRecords;
 import org.bahmni.module.offlineservice.model.EventsLog;
-import org.openmrs.api.EncounterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +21,10 @@ public class EventRecordsToEventsLogMapper {
     private final HashMap<String, FilterEvaluator> filterEvaluators;
 
     @Autowired
-    public EventRecordsToEventsLogMapper(PatientFilterEvaluator patientFilterEvaluator, EncounterService encounterService) {
+    public EventRecordsToEventsLogMapper(PatientFilterEvaluator patientFilterEvaluator, EncounterFilterEvaluator encounterFilterEvaluator) {
         filterEvaluators = new HashMap<String, FilterEvaluator>();
         filterEvaluators.put("patient", patientFilterEvaluator);
-        filterEvaluators.put("encounter", new EncounterFilterEvaluator(encounterService));
+        filterEvaluators.put("encounter", encounterFilterEvaluator);
     }
 
     public List<EventsLog> map(List<EventRecords> eventRecords) {
