@@ -6,8 +6,12 @@ import org.openmrs.api.EncounterService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class EncounterFilterEvaluator implements FilterEvaluator {
+    private final EncounterService encounterService;
+
     @Autowired
-    private EncounterService encounterService;
+    public EncounterFilterEvaluator(EncounterService encounterService) {
+        this.encounterService = encounterService;
+    }
 
     @Override
     public void evaluateFilter(String objectUuid, EventsLog eventsLog) {

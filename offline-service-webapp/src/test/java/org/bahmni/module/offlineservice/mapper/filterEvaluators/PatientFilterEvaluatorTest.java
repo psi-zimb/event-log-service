@@ -3,7 +3,6 @@ package org.bahmni.module.offlineservice.mapper.filterEvaluators;
 import org.bahmni.module.offlineservice.PatientBuilder;
 import org.bahmni.module.offlineservice.model.EventsLog;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openmrs.Patient;
@@ -16,9 +15,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-@Ignore
 public class PatientFilterEvaluatorTest {
-    private PatientFilterEvaluator patientFilterEvaluator;
 
     @Mock
     private PatientService patientService;
@@ -26,7 +23,6 @@ public class PatientFilterEvaluatorTest {
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        patientFilterEvaluator = new PatientFilterEvaluator();
     }
 
     @Test
@@ -35,7 +31,7 @@ public class PatientFilterEvaluatorTest {
         String patientUuid = "d95bf6c9-d1c6-41dc-aecf-1c06bd71358c";
         EventsLog eventLog = new EventsLog();
         when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
-
+        PatientFilterEvaluator patientFilterEvaluator = new PatientFilterEvaluator(patientService);
         patientFilterEvaluator.evaluateFilter(patientUuid, eventLog);
 
         verify(patientService, times(1)).getPatientByUuid(patientUuid);
@@ -45,7 +41,8 @@ public class PatientFilterEvaluatorTest {
     @Test
     public void shouldNotSetFilterIfUuidIsNull() throws Exception {
         EventsLog eventLog = new EventsLog();
-
+        PatientFilterEvaluator patientFilterEvaluator = new PatientFilterEvaluator(patientService);
+        patientFilterEvaluator.evaluateFilter(null, eventLog);
         patientFilterEvaluator.evaluateFilter(null, eventLog);
 
         verify(patientService, never()).getPatientByUuid(anyString());

@@ -4,7 +4,6 @@ import org.bahmni.module.offlineservice.EncounterBuilder;
 import org.bahmni.module.offlineservice.PatientBuilder;
 import org.bahmni.module.offlineservice.model.EventsLog;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openmrs.Encounter;
@@ -18,7 +17,6 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-@Ignore
 public class EncounterFilterEvaluatorTest {
     private EncounterFilterEvaluator encounterFilterEvaluator;
 
@@ -28,7 +26,6 @@ public class EncounterFilterEvaluatorTest {
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        encounterFilterEvaluator = new EncounterFilterEvaluator();
     }
 
     @Test
@@ -38,6 +35,7 @@ public class EncounterFilterEvaluatorTest {
         String encounterUuid = "d95bf6c9-d1c6-41dc-aecf-1c06bd71358c";
         EventsLog eventLog = new EventsLog();
         when(encounterService.getEncounterByUuid(encounterUuid)).thenReturn(encounter);
+        encounterFilterEvaluator = new EncounterFilterEvaluator(encounterService);
 
         encounterFilterEvaluator.evaluateFilter(encounterUuid, eventLog);
 
@@ -49,6 +47,7 @@ public class EncounterFilterEvaluatorTest {
     public void shouldNotSetFilterIfUuidIsNull() throws Exception {
         EventsLog eventLog = new EventsLog();
 
+        encounterFilterEvaluator = new EncounterFilterEvaluator(encounterService);
         encounterFilterEvaluator.evaluateFilter(null, eventLog);
 
         verify(encounterService, never()).getEncounterByUuid(anyString());

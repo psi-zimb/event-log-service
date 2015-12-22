@@ -6,7 +6,6 @@ import org.bahmni.module.offlineservice.mapper.filterEvaluators.PatientFilterEva
 import org.bahmni.module.offlineservice.model.EventRecords;
 import org.bahmni.module.offlineservice.model.EventsLog;
 import org.openmrs.api.EncounterService;
-import org.openmrs.api.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +21,11 @@ public class EventRecordsToEventsLogMapper {
     private static final String UUID_PATTERN = "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})";
     private final HashMap<String, FilterEvaluator> filterEvaluators;
 
-    public EventRecordsToEventsLogMapper() {
+    @Autowired
+    public EventRecordsToEventsLogMapper(PatientFilterEvaluator patientFilterEvaluator, EncounterService encounterService) {
         filterEvaluators = new HashMap<String, FilterEvaluator>();
-        filterEvaluators.put("patient", new PatientFilterEvaluator());
-        filterEvaluators.put("encounter", new EncounterFilterEvaluator());
+        filterEvaluators.put("patient", patientFilterEvaluator);
+        filterEvaluators.put("encounter", new EncounterFilterEvaluator(encounterService));
     }
 
     public List<EventsLog> map(List<EventRecords> eventRecords) {
@@ -42,7 +42,7 @@ public class EventRecordsToEventsLogMapper {
         String object = eventRecord.getObject();
         Pattern pattern = Pattern.compile(UUID_PATTERN);
         Matcher matcher = pattern.matcher(object);
-        if (matcher.find()){
+        if (matcher.find()) {
             filterEvaluators.get(eventRecord.getCategory()).evaluateFilter(matcher.group(0), eventsLog);
         }
     }
