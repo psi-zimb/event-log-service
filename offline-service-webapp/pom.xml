@@ -134,6 +134,18 @@
                     <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.openmrs.liquibase.ext</groupId>
+                    <artifactId>modify-column</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.openmrs.liquibase.ext</groupId>
+                    <artifactId>identity-insert</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.openmrs.liquibase.ext</groupId>
+                    <artifactId>type-converter</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
