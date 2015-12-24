@@ -1,5 +1,6 @@
 package org.bahmni.module.offlineservice.mapper;
 
+import org.bahmni.module.offlineservice.mapper.filterEvaluators.AddressHierarchyFilterEvaluator;
 import org.bahmni.module.offlineservice.mapper.filterEvaluators.EncounterFilterEvaluator;
 import org.bahmni.module.offlineservice.mapper.filterEvaluators.FilterEvaluator;
 import org.bahmni.module.offlineservice.mapper.filterEvaluators.PatientFilterEvaluator;
@@ -22,10 +23,11 @@ public class EventRecordsToEventLogMapper {
     private Pattern pattern;
 
     @Autowired
-    public EventRecordsToEventLogMapper(PatientFilterEvaluator patientFilterEvaluator, EncounterFilterEvaluator encounterFilterEvaluator) {
+    public EventRecordsToEventLogMapper(PatientFilterEvaluator patientFilterEvaluator, EncounterFilterEvaluator encounterFilterEvaluator, AddressHierarchyFilterEvaluator addressHierarchyFilterEvaluator) {
         filterEvaluators = new HashMap<String, FilterEvaluator>();
         filterEvaluators.put("patient", patientFilterEvaluator);
         filterEvaluators.put("encounter", encounterFilterEvaluator);
+        filterEvaluators.put("addressHierarchy", addressHierarchyFilterEvaluator);
         pattern = Pattern.compile(UUID_PATTERN);
     }
 

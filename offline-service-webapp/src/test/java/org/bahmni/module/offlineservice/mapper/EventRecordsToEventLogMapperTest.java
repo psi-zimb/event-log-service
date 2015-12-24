@@ -1,5 +1,6 @@
 package org.bahmni.module.offlineservice.mapper;
 
+import org.bahmni.module.offlineservice.mapper.filterEvaluators.AddressHierarchyFilterEvaluator;
 import org.bahmni.module.offlineservice.mapper.filterEvaluators.EncounterFilterEvaluator;
 import org.bahmni.module.offlineservice.mapper.filterEvaluators.PatientFilterEvaluator;
 import org.bahmni.module.offlineservice.model.EventRecords;
@@ -37,10 +38,13 @@ public class EventRecordsToEventLogMapperTest {
     @Mock
     private EncounterFilterEvaluator encounterFilterEvaluator;
 
+    @Mock
+    private AddressHierarchyFilterEvaluator addressHierarchyFilterEvaluator;
+
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        eventRecordsToEventLogMapper = new EventRecordsToEventLogMapper(patientFilterEvaluator, encounterFilterEvaluator);
+        eventRecordsToEventLogMapper = new EventRecordsToEventLogMapper(patientFilterEvaluator, encounterFilterEvaluator, addressHierarchyFilterEvaluator);
     }
 
     @Test
@@ -91,6 +95,26 @@ public class EventRecordsToEventLogMapperTest {
         List<EventLog> eventLogs = eventRecordsToEventLogMapper.map(eventRecords);
 
         verify(encounterFilterEvaluator, times(1)).evaluateFilter("d95bf6c9-d1c6-41dc-aecf-1c06bd71358c", eventLog);
+
+        assertNotNull(eventLogs);
+        assertEquals(eventRecords.size(), eventLogs.size());
+        assertEquals(eventRecord.getUuid(), eventLogs.get(0).getUuid());
+        assertEquals(eventRecord.getTimestamp(), eventLogs.get(0).getTimestamp());
+        assertEquals(eventRecord.getObject(), eventLogs.get(0).getObject());
+        assertEquals(eventRecord.getCategory(), eventLogs.get(0).getCategory());
+    }
+
+    @Test
+    public void shouldEvaluateFilterForAddressHierarchyEvents() throws Exception {
+        ArrayList<EventRecords> eventRecords = new ArrayList<EventRecords>();
+        EventRecords eventRecord = new EventRecords("uuid", "title", TIMESTAMP, "uri", "/openmrs/ws/rest/v1/address/hierarchy/d95bf6c9-d1c6-41dc-aecf-1c06bd71358c?v=full", "addressHierarchy");
+        eventRecords.add(eventRecord);
+        EventLog eventLog = new EventLog("uuid", TIMESTAMP, "/openmrs/ws/rest/v1/address/hierarchy/d95bf6c9-d1c6-41dc-aecf-1c06bd71358c?v=full", "addressHierarchy", null);
+        PowerMockito.whenNew(EventLog.class).withAnyArguments().thenReturn(eventLog);
+
+        List<EventLog> eventLogs = eventRecordsToEventLogMapper.map(eventRecords);
+
+        verify(addressHierarchyFilterEvaluator, times(1)).evaluateFilter("d95bf6c9-d1c6-41dc-aecf-1c06bd71358c", eventLog);
 
         assertNotNull(eventLogs);
         assertEquals(eventRecords.size(), eventLogs.size());
