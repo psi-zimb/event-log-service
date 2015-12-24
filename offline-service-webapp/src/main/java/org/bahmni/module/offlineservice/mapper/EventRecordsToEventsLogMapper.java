@@ -19,12 +19,14 @@ public class EventRecordsToEventsLogMapper {
 
     private static final String UUID_PATTERN = "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})";
     private final HashMap<String, FilterEvaluator> filterEvaluators;
+    private Pattern pattern;
 
     @Autowired
     public EventRecordsToEventsLogMapper(PatientFilterEvaluator patientFilterEvaluator, EncounterFilterEvaluator encounterFilterEvaluator) {
         filterEvaluators = new HashMap<String, FilterEvaluator>();
         filterEvaluators.put("patient", patientFilterEvaluator);
         filterEvaluators.put("encounter", encounterFilterEvaluator);
+        pattern = Pattern.compile(UUID_PATTERN);
     }
 
     public List<EventsLog> map(List<EventRecords> eventRecords) {
@@ -39,7 +41,6 @@ public class EventRecordsToEventsLogMapper {
 
     private void evaluateFilter(EventRecords eventRecord, EventsLog eventsLog) {
         String object = eventRecord.getObject();
-        Pattern pattern = Pattern.compile(UUID_PATTERN);
         Matcher matcher = pattern.matcher(object);
         if (matcher.find() && filterEvaluators.get(eventRecord.getCategory()) != null) {
             filterEvaluators.get(eventRecord.getCategory()).evaluateFilter(matcher.group(0), eventsLog);
