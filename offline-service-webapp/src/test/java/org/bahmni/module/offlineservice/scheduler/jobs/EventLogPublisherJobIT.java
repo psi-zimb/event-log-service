@@ -1,8 +1,8 @@
 package org.bahmni.module.offlineservice.scheduler.jobs;
 
 import IT.BaseIntegrationTest;
-import org.bahmni.module.offlineservice.model.EventsLog;
-import org.bahmni.module.offlineservice.repository.EventsLogRepository;
+import org.bahmni.module.offlineservice.model.EventLog;
+import org.bahmni.module.offlineservice.repository.EventLogRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
@@ -16,19 +16,19 @@ public class EventLogPublisherJobIT extends BaseIntegrationTest {
     @Autowired
     private EventLogPublisherJob eventLogPublisherJob;
     @Autowired
-    private EventsLogRepository eventsLogRepository;
+    private EventLogRepository eventLogRepository;
 
     @SqlGroup({
-            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:testDataSet/insertEventsLog.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:testDataSet/insertEventLogs.sql"),
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:testDataSet/insertEventRecords.sql"),
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
     })
     @Test
-    public void shouldPublishDataFromEventRecordsToEventsLog() throws Exception {
+    public void shouldPublishDataFromEventRecordsToEventLog() throws Exception {
         eventLogPublisherJob.process();
 
-        List<EventsLog> eventsLogs = eventsLogRepository.findAll();
-        assertEquals(2, eventsLogs.size());
+        List<EventLog> eventLogs = eventLogRepository.findAll();
+        assertEquals(2, eventLogs.size());
     }
 
     @SqlGroup({
@@ -36,11 +36,11 @@ public class EventLogPublisherJobIT extends BaseIntegrationTest {
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
     })
     @Test
-    public void shouldPublishDataFromEventRecordsToEventsLogForTheFirstTime() throws Exception {
+    public void shouldPublishDataFromEventRecordsToEventLogForTheFirstTime() throws Exception {
         eventLogPublisherJob.process();
 
-        List<EventsLog> eventsLogs = eventsLogRepository.findAll();
-        assertEquals(1, eventsLogs.size());
+        List<EventLog> eventLogs = eventLogRepository.findAll();
+        assertEquals(1, eventLogs.size());
     }
 
     @SqlGroup({
@@ -51,12 +51,12 @@ public class EventLogPublisherJobIT extends BaseIntegrationTest {
     public void shouldNotPublishTheSameEventsMultipleTimes() throws Exception {
         eventLogPublisherJob.process();
 
-        List<EventsLog> eventsLogs = eventsLogRepository.findAll();
-        assertEquals(1, eventsLogs.size());
+        List<EventLog> eventLogs = eventLogRepository.findAll();
+        assertEquals(1, eventLogs.size());
 
         eventLogPublisherJob.process();
 
-        eventsLogs = eventsLogRepository.findAll();
-        assertEquals(1, eventsLogs.size());
+        eventLogs = eventLogRepository.findAll();
+        assertEquals(1, eventLogs.size());
     }
 }

@@ -1,7 +1,7 @@
 package org.bahmni.module.offlineservice.mapper.filterEvaluators;
 
-import org.bahmni.module.offlineservice.model.EventsLog;
+import org.bahmni.module.offlineservice.model.EventLog;
 
 public interface FilterEvaluator {
-    void evaluateFilter(String objectUuid, EventsLog eventsLog);
+    void evaluateFilter(String objectUuid, EventLog eventLog);
 }

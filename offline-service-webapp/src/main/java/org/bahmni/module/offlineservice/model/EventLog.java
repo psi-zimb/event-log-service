@@ -5,8 +5,8 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "events_log")
-public class EventsLog {
+@Table(name = "event_log")
+public class EventLog {
     @Id
     @Column(name = "id", unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class EventsLog {
     @Column(name = "filter")
     private String filter;
 
-    public EventsLog(String uuid, Date timestamp, String object, String category, String filter) {
+    public EventLog(String uuid, Date timestamp, String object, String category, String filter) {
         this.uuid = uuid;
         this.timestamp = timestamp;
         this.object = object;
@@ -35,7 +35,7 @@ public class EventsLog {
         this.filter = filter;
     }
 
-    public EventsLog() {
+    public EventLog() {
     }
 
     public Integer getId() {

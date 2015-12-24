@@ -1,7 +1,7 @@
 package org.bahmni.module.offlineservice.mapper.filterEvaluators;
 
 import IT.BaseIntegrationTest;
-import org.bahmni.module.offlineservice.model.EventsLog;
+import org.bahmni.module.offlineservice.model.EventLog;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
@@ -21,10 +21,10 @@ public class PatientFilterEvaluatorIT extends BaseIntegrationTest {
 
     @Test
     public void shouldEvaluateFilter() throws Exception {
-        EventsLog eventsLog = new EventsLog();
-        patientFilterEvaluator.evaluateFilter("patient uuid", eventsLog);
+        EventLog eventLog = new EventLog();
+        patientFilterEvaluator.evaluateFilter("patient uuid", eventLog);
 
-        assertNotNull(eventsLog.getFilter());
-        assertEquals("Who Knows", eventsLog.getFilter());
+        assertNotNull(eventLog.getFilter());
+        assertEquals("Who Knows", eventLog.getFilter());
     }
 }

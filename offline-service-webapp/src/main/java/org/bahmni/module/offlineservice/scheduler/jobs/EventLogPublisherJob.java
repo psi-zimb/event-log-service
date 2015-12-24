@@ -1,11 +1,11 @@
 package org.bahmni.module.offlineservice.scheduler.jobs;
 
 import org.apache.log4j.Logger;
-import org.bahmni.module.offlineservice.mapper.EventRecordsToEventsLogMapper;
+import org.bahmni.module.offlineservice.mapper.EventRecordsToEventLogMapper;
 import org.bahmni.module.offlineservice.model.EventRecords;
-import org.bahmni.module.offlineservice.model.EventsLog;
+import org.bahmni.module.offlineservice.model.EventLog;
 import org.bahmni.module.offlineservice.repository.EventRecordsRepository;
-import org.bahmni.module.offlineservice.repository.EventsLogRepository;
+import org.bahmni.module.offlineservice.repository.EventLogRepository;
 import org.quartz.DisallowConcurrentExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -18,34 +18,34 @@ import java.util.List;
 @ConditionalOnExpression("'${enable.scheduling}'=='true'")
 public class EventLogPublisherJob implements Job {
     private EventRecordsRepository eventRecordsRepository;
-    private EventsLogRepository eventsLogRepository;
-    private EventRecordsToEventsLogMapper eventRecordsToEventsLogMapper;
+    private EventLogRepository eventLogRepository;
+    private EventRecordsToEventLogMapper eventRecordsToEventLogMapper;
 
     private static Logger logger = Logger.getLogger(EventLogPublisherJob.class);
 
     @Autowired
-    public EventLogPublisherJob(EventRecordsRepository eventRecordsRepository, EventsLogRepository eventsLogRepository, EventRecordsToEventsLogMapper eventRecordsToEventsLogMapper) {
+    public EventLogPublisherJob(EventRecordsRepository eventRecordsRepository, EventLogRepository eventLogRepository, EventRecordsToEventLogMapper eventRecordsToEventLogMapper) {
         this.eventRecordsRepository = eventRecordsRepository;
-        this.eventsLogRepository = eventsLogRepository;
-        this.eventRecordsToEventsLogMapper = eventRecordsToEventsLogMapper;
+        this.eventLogRepository = eventLogRepository;
+        this.eventRecordsToEventLogMapper = eventRecordsToEventLogMapper;
     }
 
     @Override
     public void process() throws InterruptedException {
-        EventsLog eventsLog = eventsLogRepository.findFirstByOrderByTimestampDesc();
+        EventLog eventLog = eventLogRepository.findFirstByOrderByTimestampDesc();
         List<EventRecords> eventRecords;
 
-        if (eventsLog != null) {
-            logger.debug("Reading events which are happened after : " + eventsLog.getTimestamp().toString());
-            eventRecords = eventRecordsRepository.findAllEventsAfterTimestamp(eventsLog.getTimestamp());
+        if (eventLog != null) {
+            logger.debug("Reading events which are happened after : " + eventLog.getTimestamp().toString());
+            eventRecords = eventRecordsRepository.findAllEventsAfterTimestamp(eventLog.getTimestamp());
         } else {
             logger.debug("Reading all events from event_records");
             eventRecords = eventRecordsRepository.findAll();
         }
 
         logger.debug("Found " + eventRecords.size() + " events.");
-        List<EventsLog> eventsLogs = eventRecordsToEventsLogMapper.map(eventRecords);
-        eventsLogRepository.save(eventsLogs);
+        List<EventLog> eventLogs = eventRecordsToEventLogMapper.map(eventRecords);
+        eventLogRepository.save(eventLogs);
         logger.debug("Copied " + eventRecords.size() + " events to events_log table");
     }
 }

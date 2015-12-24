@@ -1,6 +1,6 @@
 package org.bahmni.module.offlineservice.mapper.filterEvaluators;
 
-import org.bahmni.module.offlineservice.model.EventsLog;
+import org.bahmni.module.offlineservice.model.EventLog;
 import org.bahmni.module.offlineservice.model.PersonAttribute;
 import org.bahmni.module.offlineservice.repository.PersonAttributeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ public class EncounterFilterEvaluator implements FilterEvaluator {
     private PersonAttributeRepository personAttributeRepository;
 
     @Override
-    public void evaluateFilter(String objectUuid, EventsLog eventsLog) {
+    public void evaluateFilter(String objectUuid, EventLog eventLog) {
         if (objectUuid == null) {
             return;
         }
@@ -21,6 +21,6 @@ public class EncounterFilterEvaluator implements FilterEvaluator {
         if (personAttribute == null) {
             return;
         }
-        eventsLog.setFilter(personAttribute.getValue());
+        eventLog.setFilter(personAttribute.getValue());
     }
 }

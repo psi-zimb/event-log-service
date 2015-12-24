@@ -1,6 +1,6 @@
 package org.bahmni.module.offlineservice.mapper.filterEvaluators;
 
-import org.bahmni.module.offlineservice.model.EventsLog;
+import org.bahmni.module.offlineservice.model.EventLog;
 import org.bahmni.module.offlineservice.model.PersonAttribute;
 import org.bahmni.module.offlineservice.repository.PersonAttributeRepository;
 import org.junit.Before;
@@ -33,11 +33,11 @@ public class EncounterFilterEvaluatorTest {
         personAttribute.setValue("Value");
         when(personAttributeRepository.findByEncounterUuidAndPersonAttributeType(ENCOUNTER_UUID, ATTRIBUTE_TYPE_NAME)).thenReturn(personAttribute);
 
-        EventsLog eventsLog = new EventsLog();
-        encounterFilterEvaluator.evaluateFilter(ENCOUNTER_UUID, eventsLog);
+        EventLog eventLog = new EventLog();
+        encounterFilterEvaluator.evaluateFilter(ENCOUNTER_UUID, eventLog);
 
         verify(personAttributeRepository, times(1)).findByEncounterUuidAndPersonAttributeType(ENCOUNTER_UUID, ATTRIBUTE_TYPE_NAME);
-        assertEquals("Value", eventsLog.getFilter());
+        assertEquals("Value", eventLog.getFilter());
     }
 
     @Test
@@ -46,22 +46,22 @@ public class EncounterFilterEvaluatorTest {
         personAttribute.setValue("Value");
         when(personAttributeRepository.findByEncounterUuidAndPersonAttributeType(ENCOUNTER_UUID, ATTRIBUTE_TYPE_NAME)).thenReturn(personAttribute);
 
-        EventsLog eventsLog = new EventsLog();
-        encounterFilterEvaluator.evaluateFilter(null, eventsLog);
+        EventLog eventLog = new EventLog();
+        encounterFilterEvaluator.evaluateFilter(null, eventLog);
 
         verify(personAttributeRepository, never()).findByEncounterUuidAndPersonAttributeType(ENCOUNTER_UUID, ATTRIBUTE_TYPE_NAME);
-        assertNull(eventsLog.getFilter());
+        assertNull(eventLog.getFilter());
     }
 
     @Test
     public void shouldNotSetFilterIfAttributeIsNotAvailable() throws Exception {
         when(personAttributeRepository.findByEncounterUuidAndPersonAttributeType(ENCOUNTER_UUID, ATTRIBUTE_TYPE_NAME)).thenReturn(null);
 
-        EventsLog eventsLog = new EventsLog();
-        encounterFilterEvaluator.evaluateFilter(ENCOUNTER_UUID, eventsLog);
+        EventLog eventLog = new EventLog();
+        encounterFilterEvaluator.evaluateFilter(ENCOUNTER_UUID, eventLog);
 
         verify(personAttributeRepository, times(1)).findByEncounterUuidAndPersonAttributeType(ENCOUNTER_UUID, ATTRIBUTE_TYPE_NAME);
-        assertNull(eventsLog.getFilter());
+        assertNull(eventLog.getFilter());
     }
 
 }

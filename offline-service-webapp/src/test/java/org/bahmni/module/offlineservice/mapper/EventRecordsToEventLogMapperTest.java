@@ -3,7 +3,7 @@ package org.bahmni.module.offlineservice.mapper;
 import org.bahmni.module.offlineservice.mapper.filterEvaluators.EncounterFilterEvaluator;
 import org.bahmni.module.offlineservice.mapper.filterEvaluators.PatientFilterEvaluator;
 import org.bahmni.module.offlineservice.model.EventRecords;
-import org.bahmni.module.offlineservice.model.EventsLog;
+import org.bahmni.module.offlineservice.model.EventLog;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,12 +24,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 
-@PrepareForTest({EventRecordsToEventsLogMapper.class})
+@PrepareForTest({EventRecordsToEventLogMapper.class})
 @RunWith(PowerMockRunner.class)
-public class EventRecordsToEventsLogMapperTest {
+public class EventRecordsToEventLogMapperTest {
     public static final Date TIMESTAMP = new Date();
 
-    private EventRecordsToEventsLogMapper eventRecordsToEventsLogMapper;
+    private EventRecordsToEventLogMapper eventRecordsToEventLogMapper;
 
     @Mock
     private PatientFilterEvaluator patientFilterEvaluator;
@@ -40,16 +40,16 @@ public class EventRecordsToEventsLogMapperTest {
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        eventRecordsToEventsLogMapper = new EventRecordsToEventsLogMapper(patientFilterEvaluator, encounterFilterEvaluator);
+        eventRecordsToEventLogMapper = new EventRecordsToEventLogMapper(patientFilterEvaluator, encounterFilterEvaluator);
     }
 
     @Test
-    public void shouldMapEventRecordsToEventsLog() throws Exception {
+    public void shouldMapEventRecordsToEventLog() throws Exception {
         ArrayList<EventRecords> eventRecords = new ArrayList<EventRecords>();
         EventRecords eventRecord = new EventRecords("uuid", "title", TIMESTAMP, "uri", "object", "category");
         eventRecords.add(eventRecord);
 
-        List<EventsLog> eventLogs = eventRecordsToEventsLogMapper.map(eventRecords);
+        List<EventLog> eventLogs = eventRecordsToEventLogMapper.map(eventRecords);
 
         assertNotNull(eventLogs);
         assertEquals(eventRecords.size(), eventLogs.size());
@@ -65,12 +65,12 @@ public class EventRecordsToEventsLogMapperTest {
         ArrayList<EventRecords> eventRecords = new ArrayList<EventRecords>();
         EventRecords eventRecord = new EventRecords("uuid", "title", TIMESTAMP, "uri", "/openmrs/ws/rest/v1/patient/d95bf6c9-d1c6-41dc-aecf-1c06bd71386c?v=full", "patient");
         eventRecords.add(eventRecord);
-        EventsLog eventsLog = new EventsLog("uuid", TIMESTAMP, "/openmrs/ws/rest/v1/patient/d95bf6c9-d1c6-41dc-aecf-1c06bd71386c?v=full", "patient", null);
-        PowerMockito.whenNew(EventsLog.class).withAnyArguments().thenReturn(eventsLog);
+        EventLog eventLog = new EventLog("uuid", TIMESTAMP, "/openmrs/ws/rest/v1/patient/d95bf6c9-d1c6-41dc-aecf-1c06bd71386c?v=full", "patient", null);
+        PowerMockito.whenNew(EventLog.class).withAnyArguments().thenReturn(eventLog);
 
-        List<EventsLog> eventLogs = eventRecordsToEventsLogMapper.map(eventRecords);
+        List<EventLog> eventLogs = eventRecordsToEventLogMapper.map(eventRecords);
 
-        verify(patientFilterEvaluator, times(1)).evaluateFilter("d95bf6c9-d1c6-41dc-aecf-1c06bd71386c", eventsLog);
+        verify(patientFilterEvaluator, times(1)).evaluateFilter("d95bf6c9-d1c6-41dc-aecf-1c06bd71386c", eventLog);
 
         assertNotNull(eventLogs);
         assertEquals(eventRecords.size(), eventLogs.size());
@@ -85,12 +85,12 @@ public class EventRecordsToEventsLogMapperTest {
         ArrayList<EventRecords> eventRecords = new ArrayList<EventRecords>();
         EventRecords eventRecord = new EventRecords("uuid", "title", TIMESTAMP, "uri", "/openmrs/ws/rest/v1/encounter/d95bf6c9-d1c6-41dc-aecf-1c06bd71358c?v=full", "encounter");
         eventRecords.add(eventRecord);
-        EventsLog eventsLog = new EventsLog("uuid", TIMESTAMP, "/openmrs/ws/rest/v1/encounter/d95bf6c9-d1c6-41dc-aecf-1c06bd71358c?v=full", "encounter", null);
-        PowerMockito.whenNew(EventsLog.class).withAnyArguments().thenReturn(eventsLog);
+        EventLog eventLog = new EventLog("uuid", TIMESTAMP, "/openmrs/ws/rest/v1/encounter/d95bf6c9-d1c6-41dc-aecf-1c06bd71358c?v=full", "encounter", null);
+        PowerMockito.whenNew(EventLog.class).withAnyArguments().thenReturn(eventLog);
 
-        List<EventsLog> eventLogs = eventRecordsToEventsLogMapper.map(eventRecords);
+        List<EventLog> eventLogs = eventRecordsToEventLogMapper.map(eventRecords);
 
-        verify(encounterFilterEvaluator, times(1)).evaluateFilter("d95bf6c9-d1c6-41dc-aecf-1c06bd71358c", eventsLog);
+        verify(encounterFilterEvaluator, times(1)).evaluateFilter("d95bf6c9-d1c6-41dc-aecf-1c06bd71358c", eventLog);
 
         assertNotNull(eventLogs);
         assertEquals(eventRecords.size(), eventLogs.size());

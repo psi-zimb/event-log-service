@@ -4,7 +4,7 @@ import org.bahmni.module.offlineservice.mapper.filterEvaluators.EncounterFilterE
 import org.bahmni.module.offlineservice.mapper.filterEvaluators.FilterEvaluator;
 import org.bahmni.module.offlineservice.mapper.filterEvaluators.PatientFilterEvaluator;
 import org.bahmni.module.offlineservice.model.EventRecords;
-import org.bahmni.module.offlineservice.model.EventsLog;
+import org.bahmni.module.offlineservice.model.EventLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,35 +15,35 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public class EventRecordsToEventsLogMapper {
+public class EventRecordsToEventLogMapper {
 
     private static final String UUID_PATTERN = "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})";
     private final HashMap<String, FilterEvaluator> filterEvaluators;
     private Pattern pattern;
 
     @Autowired
-    public EventRecordsToEventsLogMapper(PatientFilterEvaluator patientFilterEvaluator, EncounterFilterEvaluator encounterFilterEvaluator) {
+    public EventRecordsToEventLogMapper(PatientFilterEvaluator patientFilterEvaluator, EncounterFilterEvaluator encounterFilterEvaluator) {
         filterEvaluators = new HashMap<String, FilterEvaluator>();
         filterEvaluators.put("patient", patientFilterEvaluator);
         filterEvaluators.put("encounter", encounterFilterEvaluator);
         pattern = Pattern.compile(UUID_PATTERN);
     }
 
-    public List<EventsLog> map(List<EventRecords> eventRecords) {
-        ArrayList<EventsLog> eventsLogs = new ArrayList<EventsLog>();
+    public List<EventLog> map(List<EventRecords> eventRecords) {
+        ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         for (EventRecords eventRecord : eventRecords) {
-            EventsLog eventsLog = new EventsLog(eventRecord.getUuid(), eventRecord.getTimestamp(), eventRecord.getObject(), eventRecord.getCategory(), null);
-            evaluateFilter(eventRecord, eventsLog);
-            eventsLogs.add(eventsLog);
+            EventLog eventLog = new EventLog(eventRecord.getUuid(), eventRecord.getTimestamp(), eventRecord.getObject(), eventRecord.getCategory(), null);
+            evaluateFilter(eventRecord, eventLog);
+            eventLogs.add(eventLog);
         }
-        return eventsLogs;
+        return eventLogs;
     }
 
-    private void evaluateFilter(EventRecords eventRecord, EventsLog eventsLog) {
+    private void evaluateFilter(EventRecords eventRecord, EventLog eventLog) {
         String object = eventRecord.getObject();
         Matcher matcher = pattern.matcher(object);
         if (matcher.find() && filterEvaluators.get(eventRecord.getCategory()) != null) {
-            filterEvaluators.get(eventRecord.getCategory()).evaluateFilter(matcher.group(0), eventsLog);
+            filterEvaluators.get(eventRecord.getCategory()).evaluateFilter(matcher.group(0), eventLog);
         }
     }
 }

@@ -1,6 +1,6 @@
 package org.bahmni.module.offlineservice.mapper.filterEvaluators;
 
-import org.bahmni.module.offlineservice.model.EventsLog;
+import org.bahmni.module.offlineservice.model.EventLog;
 import org.bahmni.module.offlineservice.model.PersonAttribute;
 import org.bahmni.module.offlineservice.repository.PersonAttributeRepository;
 import org.junit.Before;
@@ -33,30 +33,30 @@ public class PatientFilterEvaluatorTest {
         personAttribute.setValue("Value");
         when(personAttributeRepository.findByPersonUuidAndPersonAttributeType(PATIENT_UUID, ATTRIBUTE_TYPE_NAME)).thenReturn(personAttribute);
 
-        EventsLog eventsLog = new EventsLog();
-        patientFilterEvaluator.evaluateFilter(PATIENT_UUID, eventsLog);
+        EventLog eventLog = new EventLog();
+        patientFilterEvaluator.evaluateFilter(PATIENT_UUID, eventLog);
 
         verify(personAttributeRepository, times(1)).findByPersonUuidAndPersonAttributeType(PATIENT_UUID, ATTRIBUTE_TYPE_NAME);
-        assertEquals("Value", eventsLog.getFilter());
+        assertEquals("Value", eventLog.getFilter());
     }
 
     @Test
     public void shouldNotSetFilterIfUuidIsNull() throws Exception {
-        EventsLog eventsLog = new EventsLog();
-        patientFilterEvaluator.evaluateFilter(null, eventsLog);
+        EventLog eventLog = new EventLog();
+        patientFilterEvaluator.evaluateFilter(null, eventLog);
 
         verify(personAttributeRepository, never()).findByPersonUuidAndPersonAttributeType(PATIENT_UUID, ATTRIBUTE_TYPE_NAME);
-        assertNull("Should be null", eventsLog.getFilter());
+        assertNull("Should be null", eventLog.getFilter());
     }
 
     @Test
     public void shouldNotSetFilterIfAttributeIsNotAvailable() throws Exception {
         when(personAttributeRepository.findByPersonUuidAndPersonAttributeType(PATIENT_UUID, ATTRIBUTE_TYPE_NAME)).thenReturn(null);
 
-        EventsLog eventsLog = new EventsLog();
-        patientFilterEvaluator.evaluateFilter(PATIENT_UUID, eventsLog);
+        EventLog eventLog = new EventLog();
+        patientFilterEvaluator.evaluateFilter(PATIENT_UUID, eventLog);
 
         verify(personAttributeRepository, times(1)).findByPersonUuidAndPersonAttributeType(PATIENT_UUID, ATTRIBUTE_TYPE_NAME);
-        assertNull(eventsLog.getFilter());
+        assertNull(eventLog.getFilter());
     }
 }

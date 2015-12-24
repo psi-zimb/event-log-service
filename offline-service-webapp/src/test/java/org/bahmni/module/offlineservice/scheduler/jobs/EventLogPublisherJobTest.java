@@ -1,10 +1,10 @@
 package org.bahmni.module.offlineservice.scheduler.jobs;
 
-import org.bahmni.module.offlineservice.mapper.EventRecordsToEventsLogMapper;
+import org.bahmni.module.offlineservice.mapper.EventRecordsToEventLogMapper;
 import org.bahmni.module.offlineservice.model.EventRecords;
-import org.bahmni.module.offlineservice.model.EventsLog;
+import org.bahmni.module.offlineservice.model.EventLog;
 import org.bahmni.module.offlineservice.repository.EventRecordsRepository;
-import org.bahmni.module.offlineservice.repository.EventsLogRepository;
+import org.bahmni.module.offlineservice.repository.EventLogRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -24,40 +24,40 @@ public class EventLogPublisherJobTest {
     @Mock
     private EventRecordsRepository eventRecordsRepository;
     @Mock
-    private EventsLogRepository eventsLogRepository;
+    private EventLogRepository eventLogRepository;
     @Mock
-    private EventRecordsToEventsLogMapper eventRecordsToEventsLogMapper;
+    private EventRecordsToEventLogMapper eventRecordsToEventLogMapper;
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        eventLogPublisherJob = new EventLogPublisherJob(eventRecordsRepository, eventsLogRepository, eventRecordsToEventsLogMapper);
+        eventLogPublisherJob = new EventLogPublisherJob(eventRecordsRepository, eventLogRepository, eventRecordsToEventLogMapper);
     }
 
     @Test
-    public void shouldCopyEventRecordsToEventsLog() throws Exception {
+    public void shouldCopyEventRecordsToEventLog() throws Exception {
         Date timestamp = new Date();
-        EventsLog eventsLog = new EventsLog();
-        eventsLog.setTimestamp(timestamp);
-        when(eventsLogRepository.findFirstByOrderByTimestampDesc()).thenReturn(eventsLog);
+        EventLog eventLog = new EventLog();
+        eventLog.setTimestamp(timestamp);
+        when(eventLogRepository.findFirstByOrderByTimestampDesc()).thenReturn(eventLog);
 
         List<EventRecords> eventRecords = new ArrayList<EventRecords>();
         when(eventRecordsRepository.findAllEventsAfterTimestamp(timestamp)).thenReturn(eventRecords);
 
-        ArrayList<EventsLog> eventsLogs = new ArrayList<EventsLog>();
-        when(eventRecordsToEventsLogMapper.map(eventRecords)).thenReturn(eventsLogs);
+        ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
+        when(eventRecordsToEventLogMapper.map(eventRecords)).thenReturn(eventLogs);
         eventLogPublisherJob.process();
 
-        verify(eventsLogRepository, times(1)).findFirstByOrderByTimestampDesc();
+        verify(eventLogRepository, times(1)).findFirstByOrderByTimestampDesc();
         verify(eventRecordsRepository, times(1)).findAllEventsAfterTimestamp(timestamp);
         verify(eventRecordsRepository, times(0)).findAll();
-        verify(eventRecordsToEventsLogMapper, times(1)).map(eventRecords);
-        verify(eventsLogRepository, times(1)).save(eventsLogs);
+        verify(eventRecordsToEventLogMapper, times(1)).map(eventRecords);
+        verify(eventLogRepository, times(1)).save(eventLogs);
     }
 
     @Test
     public void shouldCopyAllEventRecordsForTheFirstTime() throws Exception {
-        when(eventsLogRepository.findFirstByOrderByTimestampDesc()).thenReturn(null);
+        when(eventLogRepository.findFirstByOrderByTimestampDesc()).thenReturn(null);
 
         List<EventRecords> eventRecords = new ArrayList<EventRecords>();
         when(eventRecordsRepository.findAll()).thenReturn(eventRecords);
