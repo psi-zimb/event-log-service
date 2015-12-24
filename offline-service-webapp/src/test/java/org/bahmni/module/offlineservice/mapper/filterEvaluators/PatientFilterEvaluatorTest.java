@@ -1,24 +1,26 @@
 package org.bahmni.module.offlineservice.mapper.filterEvaluators;
 
-import org.bahmni.module.offlineservice.PatientBuilder;
 import org.bahmni.module.offlineservice.model.EventsLog;
+import org.bahmni.module.offlineservice.model.PersonAttribute;
+import org.bahmni.module.offlineservice.repository.PersonAttributeRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.openmrs.Patient;
-import org.openmrs.api.PatientService;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 public class PatientFilterEvaluatorTest {
+    public static final String ATTRIBUTE_TYPE_NAME = "Catchment number";
+    public static final String PATIENT_UUID = "patientUuid";
+    @InjectMocks
+    private PatientFilterEvaluator patientFilterEvaluator = new PatientFilterEvaluator();
 
     @Mock
-    private PatientService patientService;
+    private PersonAttributeRepository personAttributeRepository;
 
     @Before
     public void setUp() throws Exception {
@@ -27,26 +29,34 @@ public class PatientFilterEvaluatorTest {
 
     @Test
     public void shouldEvaluateFilterForPatient() {
-        Patient patient = new PatientBuilder().withAddress1("Hyd").withAddress2("Telangana").build();
-        String patientUuid = "d95bf6c9-d1c6-41dc-aecf-1c06bd71358c";
-        EventsLog eventLog = new EventsLog();
-        when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
-        PatientFilterEvaluator patientFilterEvaluator = new PatientFilterEvaluator(patientService);
-        patientFilterEvaluator.evaluateFilter(patientUuid, eventLog);
+        PersonAttribute personAttribute = new PersonAttribute();
+        personAttribute.setValue("Value");
+        when(personAttributeRepository.findByPersonUuidAndPersonAttributeType(PATIENT_UUID, ATTRIBUTE_TYPE_NAME)).thenReturn(personAttribute);
 
-        verify(patientService, times(1)).getPatientByUuid(patientUuid);
-        assertEquals(patient.getPersonAddress().getAddress1(), eventLog.getFilter());
+        EventsLog eventsLog = new EventsLog();
+        patientFilterEvaluator.evaluateFilter(PATIENT_UUID, eventsLog);
+
+        verify(personAttributeRepository, times(1)).findByPersonUuidAndPersonAttributeType(PATIENT_UUID, ATTRIBUTE_TYPE_NAME);
+        assertEquals("Value", eventsLog.getFilter());
     }
 
     @Test
     public void shouldNotSetFilterIfUuidIsNull() throws Exception {
-        EventsLog eventLog = new EventsLog();
-        PatientFilterEvaluator patientFilterEvaluator = new PatientFilterEvaluator(patientService);
-        patientFilterEvaluator.evaluateFilter(null, eventLog);
-        patientFilterEvaluator.evaluateFilter(null, eventLog);
+        EventsLog eventsLog = new EventsLog();
+        patientFilterEvaluator.evaluateFilter(null, eventsLog);
 
-        verify(patientService, never()).getPatientByUuid(anyString());
-        assertNull(eventLog.getFilter());
+        verify(personAttributeRepository, never()).findByPersonUuidAndPersonAttributeType(PATIENT_UUID, ATTRIBUTE_TYPE_NAME);
+        assertNull("Should be null", eventsLog.getFilter());
     }
 
+    @Test
+    public void shouldNotSetFilterIfAttributeIsNotAvailable() throws Exception {
+        when(personAttributeRepository.findByPersonUuidAndPersonAttributeType(PATIENT_UUID, ATTRIBUTE_TYPE_NAME)).thenReturn(null);
+
+        EventsLog eventsLog = new EventsLog();
+        patientFilterEvaluator.evaluateFilter(PATIENT_UUID, eventsLog);
+
+        verify(personAttributeRepository, times(1)).findByPersonUuidAndPersonAttributeType(PATIENT_UUID, ATTRIBUTE_TYPE_NAME);
+        assertNull(eventsLog.getFilter());
+    }
 }

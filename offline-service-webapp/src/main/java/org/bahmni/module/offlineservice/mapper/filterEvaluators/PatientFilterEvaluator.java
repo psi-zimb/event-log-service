@@ -1,27 +1,27 @@
 package org.bahmni.module.offlineservice.mapper.filterEvaluators;
 
 import org.bahmni.module.offlineservice.model.EventsLog;
-import org.openmrs.Patient;
-import org.openmrs.api.PatientService;
+import org.bahmni.module.offlineservice.model.PersonAttribute;
+import org.bahmni.module.offlineservice.repository.PersonAttributeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PatientFilterEvaluator implements FilterEvaluator {
-    private PatientService patientService;
-
-
+    public static final String ATTRIBUTE_TYPE_NAME = "Catchment number";
     @Autowired
-    public PatientFilterEvaluator(PatientService patientService) {
-        this.patientService = patientService;
-    }
+    private PersonAttributeRepository personAttributeRepository;
 
     @Override
     public void evaluateFilter(String objectUuid, EventsLog eventsLog) {
         if (objectUuid == null) {
             return;
         }
-        Patient patientByUuid = patientService.getPatientByUuid(objectUuid);
-        eventsLog.setFilter(patientByUuid.getPersonAddress().getAddress1());
+        PersonAttribute attribute = personAttributeRepository.findByPersonUuidAndPersonAttributeType(objectUuid, ATTRIBUTE_TYPE_NAME);
+
+        if (attribute == null) {
+            return;
+        }
+        eventsLog.setFilter(attribute.getValue());
     }
 }

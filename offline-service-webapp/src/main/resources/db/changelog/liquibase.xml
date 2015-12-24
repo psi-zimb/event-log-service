@@ -6,7 +6,7 @@
 
     <changeSet author="Hemanth/ShruthiP" id="201512161533">
         <createTable tableName="events_log">
-            <column name="id" type="int">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
             <column name="uuid" type="varchar(40)"/>

@@ -41,7 +41,7 @@ public class EventRecordsToEventsLogMapper {
         String object = eventRecord.getObject();
         Pattern pattern = Pattern.compile(UUID_PATTERN);
         Matcher matcher = pattern.matcher(object);
-        if (matcher.find()) {
+        if (matcher.find() && filterEvaluators.get(eventRecord.getCategory()) != null) {
             filterEvaluators.get(eventRecord.getCategory()).evaluateFilter(matcher.group(0), eventsLog);
         }
     }

@@ -7,7 +7,6 @@ import org.bahmni.module.offlineservice.repository.EventRecordsRepository;
 import org.bahmni.module.offlineservice.repository.EventsLogRepository;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
@@ -15,15 +14,12 @@ import java.util.Date;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 
 public class EventLogPublisherJobTest {
-    @InjectMocks
-    private Job eventLogPublisherJob = new EventLogPublisherJob();
+    private Job eventLogPublisherJob;
 
     @Mock
     private EventRecordsRepository eventRecordsRepository;
@@ -35,6 +31,7 @@ public class EventLogPublisherJobTest {
     @Before
     public void setUp() throws Exception {
         initMocks(this);
+        eventLogPublisherJob = new EventLogPublisherJob(eventRecordsRepository, eventsLogRepository, eventRecordsToEventsLogMapper);
     }
 
     @Test

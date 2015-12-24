@@ -17,16 +17,17 @@ import java.util.List;
 @Component("eventLogPublisherJob")
 @ConditionalOnExpression("'${enable.scheduling}'=='true'")
 public class EventLogPublisherJob implements Job {
-    @Autowired
     private EventRecordsRepository eventRecordsRepository;
-    @Autowired
     private EventsLogRepository eventsLogRepository;
-    @Autowired
     private EventRecordsToEventsLogMapper eventRecordsToEventsLogMapper;
 
     private static Logger logger = Logger.getLogger(EventLogPublisherJob.class);
 
-    public EventLogPublisherJob() {
+    @Autowired
+    public EventLogPublisherJob(EventRecordsRepository eventRecordsRepository, EventsLogRepository eventsLogRepository, EventRecordsToEventsLogMapper eventRecordsToEventsLogMapper) {
+        this.eventRecordsRepository = eventRecordsRepository;
+        this.eventsLogRepository = eventsLogRepository;
+        this.eventRecordsToEventsLogMapper = eventRecordsToEventsLogMapper;
     }
 
     @Override
