@@ -129,16 +129,46 @@
                 <version>2.7</version>
                 <configuration>
                     <check>
-                        <totalBranchRate>85</totalBranchRate>
-                        <totalLineRate>41</totalLineRate>
+                        <totalBranchRate>94</totalBranchRate>
+                        <totalLineRate>100</totalLineRate>
                         <haltOnFailure>true</haltOnFailure>
+                        <regexes>
+                            <regex>
+                                <pattern>org.bahmni.module.eventlogservice.mapper.*</pattern>
+                                <branchRate>83</branchRate>
+                                <lineRate>100</lineRate>
+                            </regex>
+                            <regex>
+                                <pattern>org.bahmni.module.eventlogservice.mapper.filterEvaluators.*</pattern>
+                                <branchRate>100</branchRate>
+                                <lineRate>100</lineRate>
+                            </regex>
+                            <regex>
+                                <pattern>org.bahmni.module.eventlogservice.scheduler.jobs.*</pattern>
+                                <branchRate>100</branchRate>
+                                <lineRate>100</lineRate>
+                            </regex>
+                        </regexes>
                     </check>
+                    <instrumentation>
+                        <excludes>
+                            <exclude>org/bahmni/module/eventlogservice/model/**/*.class</exclude>
+                            <exclude>org/bahmni/module/eventlogservice/repository/**/*.class</exclude>
+                            <exclude>org/bahmni/module/eventlogservice/scheduler/*.class</exclude>
+                            <exclude>org/bahmni/module/eventlogservice/*.class</exclude>
+                        </excludes>
+                    </instrumentation>
+                    <formats>
+                        <format>html</format>
+                    </formats>
                 </configuration>
                 <executions>
                     <execution>
+                        <phase>clean</phase>
                         <goals>
                             <goal>clean</goal>
                             <goal>check</goal>
+                            <goal>dump-datafile</goal>
                         </goals>
                     </execution>
                 </executions>
