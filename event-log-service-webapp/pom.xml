@@ -12,19 +12,6 @@
     <packaging>war</packaging>
     <artifactId>event-log-service-webapp</artifactId>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
-                <configuration>
-                    <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <properties>
         <openmrs.version>1.12.0-SNAPSHOT</openmrs.version>
     </properties>
@@ -125,4 +112,37 @@
             <version>1.1.0.Final</version>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                    <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <check>
+                        <totalBranchRate>85</totalBranchRate>
+                        <totalLineRate>41</totalLineRate>
+                        <haltOnFailure>true</haltOnFailure>
+                    </check>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>clean</goal>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
