@@ -1,0 +1,5 @@
+INSERT INTO event_log (id, uuid,timestamp,filter,object,category) values (1, 'uuid1', '2015-08-11 12:36:22.0', '202020', 'url to get data', 'addres heirarchy');
+INSERT INTO event_log (id, uuid,timestamp,filter,object,category) values (2, 'uuid2', '2015-08-14 12:36:22.0', '202020', 'url to get data', 'addres heirarchy');
+INSERT INTO event_log (id, uuid,timestamp,filter,object,category) values (3, 'uuid3', '2015-08-14 12:36:22.0', '202020', 'url to get data', 'addres heirarchy');
+INSERT INTO event_log (id, uuid,timestamp,filter,object,category) values (4, 'uuid4', '2015-08-14 12:36:22.0', '202020', 'url to get data', 'addres heirarchy');
+INSERT INTO event_log (id, uuid,timestamp,filter,object,category) values (5, 'uuid5', '2015-08-14 12:36:22.0', '202020', 'url to get data', 'addres heirarchy');
