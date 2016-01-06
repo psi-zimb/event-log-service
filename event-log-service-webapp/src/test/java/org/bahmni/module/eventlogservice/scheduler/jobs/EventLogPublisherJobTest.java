@@ -38,20 +38,26 @@ public class EventLogPublisherJobTest {
     public void shouldCopyEventRecordsToEventLog() throws Exception {
         Date timestamp = new Date();
         EventLog eventLog = new EventLog();
+        eventLog.setUuid("uuid");
         eventLog.setTimestamp(timestamp);
-        when(eventLogRepository.findFirstByOrderByTimestampDesc()).thenReturn(eventLog);
+        when(eventLogRepository.findFirstByOrderByIdDesc()).thenReturn(eventLog);
 
-        List<EventRecords> eventRecords = new ArrayList<EventRecords>();
-        when(eventRecordsRepository.findAllEventsAfterTimestamp(timestamp)).thenReturn(eventRecords);
+
+        EventRecords eventRecords = new EventRecords();
+        eventRecords.setId(12);
+        when(eventRecordsRepository.findByUuid("uuid")).thenReturn(eventRecords);
+        ArrayList<EventRecords> recordsList = new ArrayList<EventRecords>();
+        when(eventRecordsRepository.findTop10ByIdAfter(eventRecords.getId())).thenReturn(recordsList);
 
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
-        when(eventRecordsToEventLogMapper.map(eventRecords)).thenReturn(eventLogs);
+        when(eventRecordsToEventLogMapper.map(recordsList)).thenReturn(eventLogs);
         eventLogPublisherJob.process();
 
-        verify(eventLogRepository, times(1)).findFirstByOrderByTimestampDesc();
-        verify(eventRecordsRepository, times(1)).findAllEventsAfterTimestamp(timestamp);
+        verify(eventLogRepository, times(1)).findFirstByOrderByIdDesc();
+        verify(eventRecordsRepository, times(1)).findByUuid("uuid");
+        verify(eventRecordsRepository, times(1)).findTop10ByIdAfter(eventRecords.getId());
         verify(eventRecordsRepository, times(0)).findAll();
-        verify(eventRecordsToEventLogMapper, times(1)).map(eventRecords);
+        verify(eventRecordsToEventLogMapper, times(1)).map(recordsList);
         verify(eventLogRepository, times(1)).save(eventLogs);
     }
 

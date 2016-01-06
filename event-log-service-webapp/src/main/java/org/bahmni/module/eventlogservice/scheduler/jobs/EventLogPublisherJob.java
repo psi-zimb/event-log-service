@@ -32,12 +32,13 @@ public class EventLogPublisherJob implements Job {
 
     @Override
     public void process() throws InterruptedException {
-        EventLog eventLog = eventLogRepository.findFirstByOrderByTimestampDesc();
+        EventLog eventLog = eventLogRepository.findFirstByOrderByIdDesc();
         List<EventRecords> eventRecords;
 
         if (eventLog != null) {
             logger.debug("Reading events which are happened after : " + eventLog.getTimestamp().toString());
-            eventRecords = eventRecordsRepository.findAllEventsAfterTimestamp(eventLog.getTimestamp());
+            EventRecords eventRecord = eventRecordsRepository.findByUuid(eventLog.getUuid());
+            eventRecords = eventRecordsRepository.findTop10ByIdAfter(eventRecord.getId());
         } else {
             logger.debug("Reading all events from event_records");
             eventRecords = eventRecordsRepository.findAll();

@@ -40,7 +40,7 @@ public class EventLogPublisherJobIT extends BaseIntegrationTest {
         eventLogPublisherJob.process();
 
         List<EventLog> eventLogs = eventLogRepository.findAll();
-        assertEquals(1, eventLogs.size());
+        assertEquals(2, eventLogs.size());
     }
 
     @SqlGroup({
@@ -52,11 +52,11 @@ public class EventLogPublisherJobIT extends BaseIntegrationTest {
         eventLogPublisherJob.process();
 
         List<EventLog> eventLogs = eventLogRepository.findAll();
-        assertEquals(1, eventLogs.size());
+        assertEquals(2, eventLogs.size());
 
         eventLogPublisherJob.process();
 
         eventLogs = eventLogRepository.findAll();
-        assertEquals(1, eventLogs.size());
+        assertEquals(2, eventLogs.size());
     }
 }
