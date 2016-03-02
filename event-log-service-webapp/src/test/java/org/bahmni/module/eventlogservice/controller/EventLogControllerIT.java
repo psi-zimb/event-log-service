@@ -21,8 +21,8 @@ public class EventLogControllerIT extends BaseIntegrationTest {
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
     })
     @Test
-    public void shouldGetAllEventLogsByFilter() throws Exception {
-        List<EventLog> events = eventLogController.getEvents(null, "202020");
+    public void shouldGetAllEventLogsByFilterStartingWith() throws Exception {
+        List<EventLog> events = eventLogController.getEvents(null, "2020");
 
         assertNotNull(events);
         assertEquals(5, events.size());
@@ -33,8 +33,8 @@ public class EventLogControllerIT extends BaseIntegrationTest {
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
     })
     @Test
-    public void shouldGetAllEventsAfterUuidAndByFilter() throws Exception {
-        List<EventLog> events = eventLogController.getEvents("uuid1", "202020");
+    public void shouldGetAllEventsAfterUuidAndByFilterStartingWith() throws Exception {
+        List<EventLog> events = eventLogController.getEvents("uuid1", "2020");
 
         assertNotNull(events);
         assertEquals(4, events.size());

@@ -23,9 +23,9 @@ public class EventLogController {
     @RequestMapping(value = "/getevents", method = RequestMethod.GET)
     public List<EventLog> getEvents(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = true) String filterBy) {
         if (uuid == null) {
-            return eventLogRepository.findTop100ByFilter(filterBy);
+            return eventLogRepository.findTop100ByFilterStartingWith(filterBy);
         }
         EventLog lastReadEventLog = eventLogRepository.findByUuid(uuid);
-        return eventLogRepository.findTop100ByFilterAndIdAfter(filterBy, lastReadEventLog.getId());
+        return eventLogRepository.findTop100ByFilterStartingWithAndIdAfter(filterBy, lastReadEventLog.getId());
     }
 }

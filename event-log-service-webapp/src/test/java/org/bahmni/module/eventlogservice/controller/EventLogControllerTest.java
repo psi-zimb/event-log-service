@@ -34,14 +34,14 @@ public class EventLogControllerTest {
         EventLog lastReadEventLog = new EventLog();
         lastReadEventLog.setId(1000);
         when(eventLogRepository.findByUuid(uuid)).thenReturn(lastReadEventLog);
-        when(eventLogRepository.findTop100ByFilterAndIdAfter(filterBy, lastReadEventLog.getId())).thenReturn(eventLogs);
+        when(eventLogRepository.findTop100ByFilterStartingWithAndIdAfter(filterBy, lastReadEventLog.getId())).thenReturn(eventLogs);
 
         List<EventLog> events = eventLogController.getEvents(uuid, filterBy);
 
 
         verify(eventLogRepository, times(1)).findByUuid(uuid);
-        verify(eventLogRepository, times(1)).findTop100ByFilterAndIdAfter(filterBy, lastReadEventLog.getId());
-        verify(eventLogRepository, never()).findTop100ByFilter(anyString());
+        verify(eventLogRepository, times(1)).findTop100ByFilterStartingWithAndIdAfter(filterBy, lastReadEventLog.getId());
+        verify(eventLogRepository, never()).findTop100ByFilterStartingWith(anyString());
         assertNotNull(events);
     }
 
@@ -49,14 +49,14 @@ public class EventLogControllerTest {
     public void shouldGetAllEventLogForTheFirstTime() throws Exception {
         String filterBy = "303020";
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
-        when(eventLogRepository.findTop100ByFilter(filterBy)).thenReturn(eventLogs);
+        when(eventLogRepository.findTop100ByFilterStartingWith(filterBy)).thenReturn(eventLogs);
 
         List<EventLog> events = eventLogController.getEvents(null, filterBy);
 
 
-        verify(eventLogRepository, times(1)).findTop100ByFilter(filterBy);
+        verify(eventLogRepository, times(1)).findTop100ByFilterStartingWith(filterBy);
         verify(eventLogRepository, never()).findByUuid(anyString());
-        verify(eventLogRepository, never()).findTop100ByFilterAndIdAfter(anyString(), anyInt());
+        verify(eventLogRepository, never()).findTop100ByFilterStartingWithAndIdAfter(anyString(), anyInt());
         assertNotNull(events);
     }
 }
