@@ -73,4 +73,23 @@ public class EventLogPublisherJobTest {
         verify(eventRecordsRepository, times(1)).findAll();
         verify(eventRecordsRepository, times(0)).findAllEventsAfterTimestamp(any(Date.class));
     }
+
+    @Test
+    public void shouldThrowErrorWhenNoEventIsPresentInEventRecords() throws Exception {
+        Date timestamp = new Date();
+        EventLog eventLog = new EventLog();
+        eventLog.setUuid("uuid");
+        eventLog.setTimestamp(timestamp);
+        when(eventLogRepository.findFirstByOrderByIdDesc()).thenReturn(eventLog);
+        EventRecords eventRecords =null;
+        when(eventRecordsRepository.findByUuid("uuid")).thenReturn(null);
+
+        eventLogPublisherJob.process();
+
+        verify(eventLogRepository, times(1)).findFirstByOrderByIdDesc();
+        verify(eventRecordsRepository, times(0)).findTop10ByIdAfter(null);
+        verify(eventRecordsRepository, times(1)).findByUuid("uuid");
+        ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
+        verify(eventLogRepository, times(1)).save(eventLogs);
+    }
 }

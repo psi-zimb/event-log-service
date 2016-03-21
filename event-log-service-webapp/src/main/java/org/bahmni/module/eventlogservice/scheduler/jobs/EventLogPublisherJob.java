@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @DisallowConcurrentExecution
@@ -33,12 +34,16 @@ public class EventLogPublisherJob implements Job {
     @Override
     public void process() throws InterruptedException {
         EventLog eventLog = eventLogRepository.findFirstByOrderByIdDesc();
-        List<EventRecords> eventRecords;
+        List<EventRecords> eventRecords = new ArrayList<EventRecords>();
 
         if (eventLog != null) {
             logger.debug("Reading events which are happened after : " + eventLog.getTimestamp().toString());
             EventRecords eventRecord = eventRecordsRepository.findByUuid(eventLog.getUuid());
-            eventRecords = eventRecordsRepository.findTop10ByIdAfter(eventRecord.getId());
+            if(eventRecord != null){
+                eventRecords = eventRecordsRepository.findTop10ByIdAfter(eventRecord.getId());
+            }else{
+                logger.error("Unable to find last read event");
+            }
         } else {
             logger.debug("Reading all events from event_records");
             eventRecords = eventRecordsRepository.findAll();
