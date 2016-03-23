@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class PatientFilterEvaluatorTest {
-    public static final String ATTRIBUTE_TYPE_NAME = "Catchment number";
+    public static final String ATTRIBUTE_TYPE_NAME = "addressCode";
     public static final String PATIENT_UUID = "patientUuid";
     @InjectMocks
     private PatientFilterEvaluator patientFilterEvaluator = new PatientFilterEvaluator();
