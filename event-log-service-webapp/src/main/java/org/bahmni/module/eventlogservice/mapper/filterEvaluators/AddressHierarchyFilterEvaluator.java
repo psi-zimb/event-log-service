@@ -17,6 +17,8 @@ public class AddressHierarchyFilterEvaluator implements FilterEvaluator {
             return;
         }
         AddressHierarchyEntry addressHierarchyEntry = addressHierarchyEntryRepository.findByUuid(objectUuid);
-        eventLog.setFilter(addressHierarchyEntry.getUserGeneratedId());
+        if(addressHierarchyEntry.getLevelId() != null && addressHierarchyEntry.getLevelId() > 3) {
+            eventLog.setFilter(addressHierarchyEntry.getUserGeneratedId());
+        }
     }
 }

@@ -2,7 +2,7 @@ INSERT INTO person(person_id)
 VALUES (1);
 
 INSERT INTO person_attribute_type(person_attribute_type_id, name)
-VALUES (1, 'Catchment number');
+VALUES (1, 'addressCode');
 
 INSERT INTO person_attribute(person_attribute_id, person_id, person_attribute_type_id, value)
 VALUES (1, 1, 1, 'Who Knows');

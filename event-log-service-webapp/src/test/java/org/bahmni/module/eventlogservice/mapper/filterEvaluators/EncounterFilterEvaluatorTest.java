@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EncounterFilterEvaluatorTest {
-    public static final String ATTRIBUTE_TYPE_NAME = "Catchment number";
+    public static final String ATTRIBUTE_TYPE_NAME = "addressCode";
     public static final String ENCOUNTER_UUID = "encounterUuid";
     @InjectMocks
     private EncounterFilterEvaluator encounterFilterEvaluator = new EncounterFilterEvaluator();
