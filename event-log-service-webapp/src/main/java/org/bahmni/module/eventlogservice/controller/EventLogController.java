@@ -21,7 +21,7 @@ public class EventLogController {
         this.eventLogRepository = eventLogRepository;
     }
 
-    @RequestMapping(value = "/getevents", method = RequestMethod.GET)
+    @RequestMapping(value = "/events", method = RequestMethod.GET)
     public List<EventLog> getEvents(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = true) String filterBy) {
         List<String> categoryList = new ArrayList<String>();
         categoryList.add("addressHierarchy");
@@ -46,4 +46,16 @@ public class EventLogController {
             return  eventLogRepository.findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy, lastReadEventLog.getId());
         }
     }
+
+    @RequestMapping(value = "/concepts", method = RequestMethod.GET)
+    public List<EventLog> getConcepts(@RequestParam(value = "uuid", required = false) String uuid) {
+
+        if (uuid == null) {
+            return eventLogRepository.findTop100ByCategoryIs("offline-concepts");
+        }
+        EventLog lastReadEventLog = eventLogRepository.findByUuid(uuid);
+        return eventLogRepository.findTop100ByCategoryIsAndIdAfter("offline-concepts", lastReadEventLog.getId());
+    }
+
+
 }
