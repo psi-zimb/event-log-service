@@ -44,7 +44,7 @@ public class EventRecordsToEventLogMapperTest {
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        eventRecordsToEventLogMapper = new EventRecordsToEventLogMapper(patientFilterEvaluator, encounterFilterEvaluator, addressHierarchyFilterEvaluator);
+        eventRecordsToEventLogMapper = new EventRecordsToEventLogMapper(patientFilterEvaluator, encounterFilterEvaluator, addressHierarchyFilterEvaluator, null);
     }
 
     @Test
