@@ -26,7 +26,7 @@ public class EventRecordsToEventLogMapper {
     public EventRecordsToEventLogMapper(PatientFilterEvaluator patientFilterEvaluator, EncounterFilterEvaluator encounterFilterEvaluator, AddressHierarchyFilterEvaluator addressHierarchyFilterEvaluator) {
         filterEvaluators = new HashMap<String, FilterEvaluator>();
         filterEvaluators.put("patient", patientFilterEvaluator);
-        filterEvaluators.put("Encounter", encounterFilterEvaluator);
+        filterEvaluators.put("encounter", encounterFilterEvaluator);
         filterEvaluators.put("addressHierarchy", addressHierarchyFilterEvaluator);
         pattern = Pattern.compile(UUID_PATTERN);
     }

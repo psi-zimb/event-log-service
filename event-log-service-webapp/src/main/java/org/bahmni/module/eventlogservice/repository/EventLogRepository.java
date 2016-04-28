@@ -11,20 +11,9 @@ import java.util.List;
 public interface EventLogRepository extends JpaRepository<EventLog, Integer> {
     EventLog findFirstByOrderByTimestampDesc();
 
-    List<EventLog> findTop100ByFilterStartingWithAndIdAfterAndCategoryNotIn(@Param("filter") String filter, @Param("id") Integer id,
-                                                                            @Param("category") List<String> categoryList);
+    List<EventLog> findTop100ByFilterStartingWithAndIdAfter(@Param("filter") String filter, @Param("id") Integer id);
 
-    List<EventLog> findTop100ByFilterStartingWithAndCategoryNotIn(@Param("filter") String filter, @Param("category") List<String> categoryList);
-
-    List<EventLog> findTop100ByCategoryAndFilterIsNull(@Param("category") String category);
-
-    List<EventLog> findTop100ByCategoryAndIdAfterAndFilterIsNull(@Param("category") String category, @Param("id") Integer id);
-
-    List<EventLog> findTop100ByCategoryAndFilterStartingWith(@Param("category") String category, @Param("filter") String filter);
-
-    List<EventLog> findTop100ByCategoryAndFilterStartingWithAndIdAfter(@Param("category") String category,
-                                                                       @Param("filter") String filter, @Param("id") Integer id);
-
+    List<EventLog> findTop100ByFilterStartingWith(@Param("filter") String filter);
 
     EventLog findByUuid(@Param("uuid") String uuid);
 

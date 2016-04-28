@@ -19,9 +19,6 @@ public class AddressHierarchyEntry {
     @Column(name = "uuid")
     private String uuid;
 
-    @Column(name = "level_id")
-    private Integer levelId;
-
     public Integer getId() {
         return id;
     }
@@ -52,13 +49,5 @@ public class AddressHierarchyEntry {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public Integer getLevelId() {
-        return levelId;
-    }
-
-    public void setLevelId(Integer levelId) {
-        this.levelId = levelId;
     }
 }

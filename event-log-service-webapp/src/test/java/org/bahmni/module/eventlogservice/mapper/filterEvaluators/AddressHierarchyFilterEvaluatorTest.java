@@ -27,24 +27,9 @@ public class AddressHierarchyFilterEvaluatorTest {
     }
 
     @Test
-    public void shouldEvaluateFilterForAddressHierarchyForTop3Levels() throws Exception {
+    public void shouldEvaluateFilterForAddressHierarchy() throws Exception {
         AddressHierarchyEntry addressHierarchyEntry = new AddressHierarchyEntry();
         addressHierarchyEntry.setUserGeneratedId("Geocode");
-        addressHierarchyEntry.setLevelId(1);
-        when(addressHierarchyEntryRepository.findByUuid("addressUuid")).thenReturn(addressHierarchyEntry);
-        EventLog eventLog = new EventLog();
-
-        addressHierarchyFilterEvaluator.evaluateFilter("addressUuid", eventLog);
-
-        verify(addressHierarchyEntryRepository, times(1)).findByUuid("addressUuid");
-        assertNull(eventLog.getFilter());
-    }
-
-    @Test
-    public void shouldEvaluateFilterForAddressHierarchyForLowersLevels() throws Exception {
-        AddressHierarchyEntry addressHierarchyEntry = new AddressHierarchyEntry();
-        addressHierarchyEntry.setUserGeneratedId("Geocode");
-        addressHierarchyEntry.setLevelId(4);
         when(addressHierarchyEntryRepository.findByUuid("addressUuid")).thenReturn(addressHierarchyEntry);
         EventLog eventLog = new EventLog();
 
@@ -54,22 +39,6 @@ public class AddressHierarchyFilterEvaluatorTest {
         assertNotNull(eventLog.getFilter());
         assertEquals(addressHierarchyEntry.getUserGeneratedId(), eventLog.getFilter());
     }
-
-
-    @Test
-    public void shouldNotSetFilterILevelIdIsNull() throws Exception {
-        AddressHierarchyEntry addressHierarchyEntry = new AddressHierarchyEntry();
-        addressHierarchyEntry.setUserGeneratedId("Geocode");
-        addressHierarchyEntry.setLevelId(null);
-        when(addressHierarchyEntryRepository.findByUuid("addressUuid")).thenReturn(addressHierarchyEntry);
-        EventLog eventLog = new EventLog();
-
-        addressHierarchyFilterEvaluator.evaluateFilter("addressUuid", eventLog);
-
-        verify(addressHierarchyEntryRepository, times(1)).findByUuid("addressUuid");
-        assertNull(eventLog.getFilter());
-    }
-
 
     @Test
     public void shouldNotSetFilterIfUuidIsNull() throws Exception {

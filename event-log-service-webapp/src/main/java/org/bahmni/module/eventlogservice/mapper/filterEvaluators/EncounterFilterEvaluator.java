@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EncounterFilterEvaluator implements FilterEvaluator {
-    public static final String ATTRIBUTE_TYPE_NAME = "addressCode";
+    public static final String ATTRIBUTE_TYPE_NAME = "Catchment number";
     @Autowired
     private PersonAttributeRepository personAttributeRepository;
 

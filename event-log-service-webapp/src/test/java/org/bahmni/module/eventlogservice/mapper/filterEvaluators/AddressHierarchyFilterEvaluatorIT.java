@@ -18,32 +18,11 @@ public class AddressHierarchyFilterEvaluatorIT extends BaseIntegrationTest{
     private AddressHierarchyFilterEvaluator addressHierarchyFilterEvaluator;
 
     @Test
-    public void shouldEvaluateFilterForTop3Levels() throws Exception {
+    public void shouldEvaluateFilter() throws Exception {
         EventLog eventLog = new EventLog();
 
-        addressHierarchyFilterEvaluator.evaluateFilter("parentAddressUuid", eventLog);
+        addressHierarchyFilterEvaluator.evaluateFilter("address uuid", eventLog);
 
-        assertEquals(null, eventLog.getFilter());
-
-    }
-
-    @Test
-    public void shouldEvaluateFilterForLowerLevels() throws Exception {
-        EventLog eventLog = new EventLog();
-
-        addressHierarchyFilterEvaluator.evaluateFilter("childAddressUuid", eventLog);
-
-        assertEquals("19203869", eventLog.getFilter());
-
-    }
-
-    @Test
-    public void shouldReturnNullIfAddressHasNoLevelId() throws Exception {
-        EventLog eventLog = new EventLog();
-
-        addressHierarchyFilterEvaluator.evaluateFilter("childAddress", eventLog);
-
-        assertEquals(null, eventLog.getFilter());
-
+        assertEquals("1920386", eventLog.getFilter());
     }
 }

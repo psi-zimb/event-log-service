@@ -4,4 +4,3 @@ truncate TABLE person_attribute;
 truncate TABLE person_attribute_type;
 truncate TABLE encounter;
 truncate TABLE person;
-truncate TABLE address_hierarchy_entry
