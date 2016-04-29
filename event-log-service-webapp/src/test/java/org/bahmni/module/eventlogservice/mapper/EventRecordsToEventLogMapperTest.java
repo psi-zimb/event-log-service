@@ -87,9 +87,9 @@ public class EventRecordsToEventLogMapperTest {
     @Test
     public void shouldEvaluateFilterForEncounterEvents() throws Exception {
         ArrayList<EventRecords> eventRecords = new ArrayList<EventRecords>();
-        EventRecords eventRecord = new EventRecords("uuid", "title", TIMESTAMP, "uri", "/openmrs/ws/rest/v1/encounter/d95bf6c9-d1c6-41dc-aecf-1c06bd71358c?v=full", "encounter");
+        EventRecords eventRecord = new EventRecords("uuid", "title", TIMESTAMP, "uri", "/openmrs/ws/rest/v1/encounter/d95bf6c9-d1c6-41dc-aecf-1c06bd71358c?v=full", "Encounter");
         eventRecords.add(eventRecord);
-        EventLog eventLog = new EventLog("uuid", TIMESTAMP, "/openmrs/ws/rest/v1/encounter/d95bf6c9-d1c6-41dc-aecf-1c06bd71358c?v=full", "encounter", null);
+        EventLog eventLog = new EventLog("uuid", TIMESTAMP, "/openmrs/ws/rest/v1/encounter/d95bf6c9-d1c6-41dc-aecf-1c06bd71358c?v=full", "Encounter", null);
         PowerMockito.whenNew(EventLog.class).withAnyArguments().thenReturn(eventLog);
 
         List<EventLog> eventLogs = eventRecordsToEventLogMapper.map(eventRecords);
