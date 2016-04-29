@@ -42,9 +42,12 @@ public class EventRecordsToEventLogMapper {
         for (EventRecords eventRecord : eventRecords) {
             EventLog eventLog = new EventLog(eventRecord.getUuid(), eventRecord.getTimestamp(), eventRecord.getObject(), eventRecord.getCategory(), null);
             evaluateFilter(eventRecord, eventLog);
-            if (eventRecord.getCategory().equalsIgnoreCase("all-concepts") && isOfflineConceptEvent(getConceptUuidFromUrl(eventLog.getObject()))
+            if ((eventRecord.getCategory().equalsIgnoreCase("all-concepts") && isOfflineConceptEvent(getConceptUuidFromUrl(eventLog.getObject())))
                     || eventRecord.getCategory().equalsIgnoreCase("offline-concepts")) {
                 eventLog.setCategory("offline-concepts");
+                eventLogs.add(eventLog);
+            }
+            else if (!eventRecord.getCategory().equalsIgnoreCase("all-concepts")){
                 eventLogs.add(eventLog);
             }
         }
