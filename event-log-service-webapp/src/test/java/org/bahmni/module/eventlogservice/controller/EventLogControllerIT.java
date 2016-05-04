@@ -80,12 +80,36 @@ public class EventLogControllerIT extends BaseIntegrationTest {
 
 
     @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:testDataSet/eventLogController/insertConceptEventLogs.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
+    })
+    @Test
+    public void shouldGetAllConceptEventLogsByCategory() throws Exception {
+        List<EventLog> events = eventLogController.getConcepts(null);
+
+        assertNotNull(events);
+        assertEquals(5, events.size());
+    }
+
+    @SqlGroup({
             @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:testDataSet/eventLogController/insertEventLogs.sql"),
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
     })
     @Test
     public void shouldGetAllEventLogsAfterUuidByCategoryAndFilterStartingWith() throws Exception {
         List<EventLog> events = eventLogController.getAddressHierarchyEvents("uuid3", "2020");
+
+        assertNotNull(events);
+        assertEquals(4, events.size());
+    }
+
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:testDataSet/eventLogController/insertConceptEventLogs.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
+    })
+    @Test
+    public void shouldGetAllConceptEventsAfterUuidAndByCategoryStartingWith() throws Exception {
+        List<EventLog> events = eventLogController.getConcepts("conceptUuid1");
 
         assertNotNull(events);
         assertEquals(2, events.size());

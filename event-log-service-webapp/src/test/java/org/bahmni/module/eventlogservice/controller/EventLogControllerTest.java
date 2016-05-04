@@ -48,6 +48,25 @@ public class EventLogControllerTest {
     }
 
     @Test
+    public void shouldGetConceptEventLog() throws Exception {
+        String uuid = "uuid1";
+        String category = "offline-concepts";
+        ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
+        EventLog lastReadEventLog = new EventLog();
+        lastReadEventLog.setId(1000);
+        when(eventLogRepository.findByUuid(uuid)).thenReturn(lastReadEventLog);
+        when(eventLogRepository.findTop100ByCategoryIsAndIdAfter(category, lastReadEventLog.getId())).thenReturn(eventLogs);
+
+        List<EventLog> concepts = eventLogController.getConcepts(uuid);
+
+
+        verify(eventLogRepository, times(1)).findByUuid(uuid);
+        verify(eventLogRepository, times(1)).findTop100ByCategoryIsAndIdAfter(category, lastReadEventLog.getId());
+        verify(eventLogRepository, never()).findTop100ByCategoryIs(anyString());
+        assertNotNull(concepts);
+    }
+
+    @Test
     public void shouldGetAllEventLogExcludingCategoriesForTheFirstTime() throws Exception {
         String filterBy = "303020";
         List<String> categoryList = new ArrayList<String>();
@@ -136,6 +155,21 @@ public class EventLogControllerTest {
         verify(eventLogRepository, never()).findTop100ByCategoryAndIdAfterAndFilterIsNull(anyString(), anyInt());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterStartingWithAndIdAfter(anyString(), anyString(), anyInt());
 
+        assertNotNull(events);
+    }
+
+    @Test
+    public void shouldGetAllConceptEventLogsForTheFirstTime() throws Exception {
+        String category = "offline-concepts";
+        ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
+        when(eventLogRepository.findTop100ByCategoryIs(category)).thenReturn(eventLogs);
+
+        List<EventLog> events = eventLogController.getConcepts(null);
+
+
+        verify(eventLogRepository, times(1)).findTop100ByCategoryIs(category);
+        verify(eventLogRepository, never()).findByUuid(anyString());
+        verify(eventLogRepository, never()).findTop100ByCategoryIsAndIdAfter(anyString(), anyInt());
         assertNotNull(events);
     }
 }
