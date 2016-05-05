@@ -91,6 +91,20 @@ public class EventRecordsToEventLogMapperTest {
     }
 
     @Test
+    public void shouldNotMapConceptEventRecordsToEventLogIfTheyAreNotChildrenOfOfflineConceptsSet() throws Exception {
+        ArrayList<EventRecords> eventRecords = new ArrayList<EventRecords>();
+        String conceptUrl = "/openmrs/ws/rest/v1/concept/cfc68437-4e98-4c98-b7f9-a787c68d82ad?s=byFullySpecifiedName&v=bahmni&name=Magnesium";
+        EventRecords eventRecord = new EventRecords("uuid", "title", TIMESTAMP, "uri", conceptUrl, "all-concepts");
+        eventRecords.add(eventRecord);
+
+        when(jdbcTemplate.queryForObject(any(String.class), any(EventRecordsToEventLogMapper.ConceptRowMapper.class))).thenReturn(0);
+
+        List<EventLog> eventLogs = eventRecordsToEventLogMapper.map(eventRecords);
+
+        assertEquals(0, eventLogs.size());
+    }
+
+    @Test
     public void shouldMapOfflineConceptEventRecordsToEventLog() throws Exception {
         ArrayList<EventRecords> eventRecords = new ArrayList<EventRecords>();
         String conceptUrl = "/openmrs/ws/rest/v1/concept/cfc68437-4e98-4c98-b7f9-a787c68d82ad?s=byFullySpecifiedName&v=bahmni&name=Magnesium";
