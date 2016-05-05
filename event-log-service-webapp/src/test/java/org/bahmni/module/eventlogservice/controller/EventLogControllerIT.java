@@ -100,7 +100,7 @@ public class EventLogControllerIT extends BaseIntegrationTest {
         List<EventLog> events = eventLogController.getAddressHierarchyEvents("uuid3", "2020");
 
         assertNotNull(events);
-        assertEquals(4, events.size());
+        assertEquals(2, events.size());
     }
 
     @SqlGroup({
@@ -112,7 +112,7 @@ public class EventLogControllerIT extends BaseIntegrationTest {
         List<EventLog> events = eventLogController.getConcepts("conceptUuid1");
 
         assertNotNull(events);
-        assertEquals(2, events.size());
+        assertEquals(4, events.size());
     }
 
 
