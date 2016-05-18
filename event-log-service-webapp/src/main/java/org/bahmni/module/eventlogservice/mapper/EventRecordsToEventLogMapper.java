@@ -46,8 +46,9 @@ public class EventRecordsToEventLogMapper {
                 if(isOfflineConceptEvent(getConceptUuidFromUrl(eventLog.getObject()))){
                     eventLog.setCategory("offline-concepts");
                 }
-                else
-                    continue;
+                else {
+                    eventLog.setCategory("concepts");;
+                }
             }
             eventLogs.add(eventLog);
         }

@@ -101,7 +101,9 @@ public class EventRecordsToEventLogMapperTest {
 
         List<EventLog> eventLogs = eventRecordsToEventLogMapper.map(eventRecords);
 
-        assertEquals(0, eventLogs.size());
+        assertEquals(1, eventLogs.size());
+        assertEquals("concepts", eventLogs.get(0).getCategory());
+
     }
 
     @Test
