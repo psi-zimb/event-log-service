@@ -5,7 +5,7 @@ Insert into event_records(uuid,
                           object,
                           category)
   (select uuid(),
-     'Address Hierarchy',
+     'addressHierarchy',
      '1970-01-01 00:00:01',
      concat('/openmrs/ws/rest/v1/addressHierarchy/',uuid),
      concat('/openmrs/ws/rest/v1/addressHierarchy/',uuid),

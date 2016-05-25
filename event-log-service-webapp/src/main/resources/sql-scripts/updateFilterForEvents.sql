@@ -1,7 +1,7 @@
 -- update filter for address hierarchy entry events.
 UPDATE event_log el
   INNER JOIN address_hierarchy_entry ahe
-    ON el.object LIKE concat('%', ahe.uuid, '%') AND el.category = 'Address Hierarchy'
+    ON el.object LIKE concat('%', ahe.uuid, '%') AND el.category = 'addressHierarchy'
 SET el.filter = ahe.user_generated_id;
 
 -- update filter for patient events.
@@ -11,7 +11,7 @@ UPDATE event_log el
   INNER JOIN person_attribute pa
     ON pa.person_id = p.person_id
   INNER JOIN person_attribute_type pat
-    ON pa.person_attribute_type_id = pat.person_attribute_type_id AND pat.name='class'
+    ON pa.person_attribute_type_id = pat.person_attribute_type_id AND pat.name='addressCode'
 SET el.filter = pa.value;
 
 -- update filter for encounter events.
@@ -21,5 +21,5 @@ UPDATE event_log el
   INNER JOIN person_attribute pa
     ON pa.person_id = e.patient_id
   INNER JOIN person_attribute_type pat
-    ON pa.person_attribute_type_id = pat.person_attribute_type_id AND pat.name='class'
+    ON pa.person_attribute_type_id = pat.person_attribute_type_id AND pat.name='addressCode'
 SET el.filter = pa.value;
