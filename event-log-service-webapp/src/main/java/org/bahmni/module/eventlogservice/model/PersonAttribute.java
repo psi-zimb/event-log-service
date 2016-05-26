@@ -20,6 +20,9 @@ public class PersonAttribute {
     @Column(name = "value")
     private String value;
 
+    @Column(name = "voided")
+    private Boolean voided;
+
     @OneToOne
     @JoinColumn(name = "person_attribute_type_id")
     private PersonAttributeType personAttributeType;

@@ -33,6 +33,7 @@ public class EventRecordsToEventLogMapper {
         filterEvaluators.put("patient", patientFilterEvaluator);
         filterEvaluators.put("Encounter", encounterFilterEvaluator);
         filterEvaluators.put("addressHierarchy", addressHierarchyFilterEvaluator);
+        filterEvaluators.put("SHREncounter", encounterFilterEvaluator);
         pattern = Pattern.compile(UUID_PATTERN);
         this.jdbcTemplate = jdbcTemplate;
     }

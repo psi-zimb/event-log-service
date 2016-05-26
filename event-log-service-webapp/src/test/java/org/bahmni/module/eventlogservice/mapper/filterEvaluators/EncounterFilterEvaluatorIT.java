@@ -26,4 +26,13 @@ public class EncounterFilterEvaluatorIT extends BaseIntegrationTest {
         assertNotNull(eventLog.getFilter());
         assertEquals("Who Knows", eventLog.getFilter());
     }
+
+    @Test
+    public void shouldEvaluateFilterValueForNonVoidedPersonAttribute() throws Exception {
+        EventLog eventLog = new EventLog();
+        encounterFilterEvaluator.evaluateFilter("encounter uuid2", eventLog);
+
+        assertNotNull(eventLog.getFilter());
+        assertEquals("Second", eventLog.getFilter());
+    }
 }

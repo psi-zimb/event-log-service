@@ -27,4 +27,13 @@ public class PatientFilterEvaluatorIT extends BaseIntegrationTest {
         assertNotNull(eventLog.getFilter());
         assertEquals("Who Knows", eventLog.getFilter());
     }
+
+    @Test
+    public void shouldEvaluateFilterForNonVoidedPersonAttribute() throws Exception {
+        EventLog eventLog = new EventLog();
+        patientFilterEvaluator.evaluateFilter("patient2", eventLog);
+
+        assertNotNull(eventLog.getFilter());
+        assertEquals("Second", eventLog.getFilter());
+    }
 }
