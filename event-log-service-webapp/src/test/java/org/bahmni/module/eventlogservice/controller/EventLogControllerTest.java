@@ -35,13 +35,13 @@ public class EventLogControllerTest {
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         EventLog lastReadEventLog = new EventLog();
         lastReadEventLog.setId(1000);
-        when(eventLogRepository.findByUuid(uuid)).thenReturn(lastReadEventLog);
+        when(eventLogRepository.findTop1ByUuid(uuid)).thenReturn(lastReadEventLog);
         when(eventLogRepository.findTop100ByFilterStartingWithAndIdAfterAndCategoryNotIn(filterBy, lastReadEventLog.getId(), categoryList)).thenReturn(eventLogs);
 
         List<EventLog> events = eventLogController.getEvents(uuid, filterBy);
 
 
-        verify(eventLogRepository, times(1)).findByUuid(uuid);
+        verify(eventLogRepository, times(1)).findTop1ByUuid(uuid);
         verify(eventLogRepository, times(1)).findTop100ByFilterStartingWithAndIdAfterAndCategoryNotIn(filterBy, lastReadEventLog.getId(), categoryList);
         verify(eventLogRepository, never()).findTop100ByFilterStartingWithAndCategoryNotIn(anyString(), anyList());
         assertNotNull(events);
@@ -54,13 +54,13 @@ public class EventLogControllerTest {
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         EventLog lastReadEventLog = new EventLog();
         lastReadEventLog.setId(1000);
-        when(eventLogRepository.findByUuid(uuid)).thenReturn(lastReadEventLog);
+        when(eventLogRepository.findTop1ByUuid(uuid)).thenReturn(lastReadEventLog);
         when(eventLogRepository.findTop100ByCategoryIsAndIdAfter(category, lastReadEventLog.getId())).thenReturn(eventLogs);
 
         List<EventLog> concepts = eventLogController.getConcepts(uuid);
 
 
-        verify(eventLogRepository, times(1)).findByUuid(uuid);
+        verify(eventLogRepository, times(1)).findTop1ByUuid(uuid);
         verify(eventLogRepository, times(1)).findTop100ByCategoryIsAndIdAfter(category, lastReadEventLog.getId());
         verify(eventLogRepository, never()).findTop100ByCategoryIs(anyString());
         assertNotNull(concepts);
@@ -78,7 +78,7 @@ public class EventLogControllerTest {
 
 
         verify(eventLogRepository, times(1)).findTop100ByFilterStartingWithAndCategoryNotIn(filterBy, categoryList);
-        verify(eventLogRepository, never()).findByUuid(anyString());
+        verify(eventLogRepository, never()).findTop1ByUuid(anyString());
         verify(eventLogRepository, never()).findTop100ByFilterStartingWithAndIdAfterAndCategoryNotIn(anyString(), anyInt(), anyList());
         assertNotNull(events);
     }
@@ -90,12 +90,12 @@ public class EventLogControllerTest {
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         EventLog lastReadEventLog = new EventLog();
         lastReadEventLog.setId(1000);
-        when(eventLogRepository.findByUuid(uuid)).thenReturn(lastReadEventLog);
+        when(eventLogRepository.findTop1ByUuid(uuid)).thenReturn(lastReadEventLog);
         when(eventLogRepository.findTop100ByCategoryAndFilterIsNull("addressHierarchy")).thenReturn(eventLogs);
 
         List<EventLog> events = eventLogController.getAddressHierarchyEvents(uuid, null);
 
-        verify(eventLogRepository, times(1)).findByUuid(uuid);
+        verify(eventLogRepository, times(1)).findTop1ByUuid(uuid);
         verify(eventLogRepository, times(1)).findTop100ByCategoryAndIdAfterAndFilterIsNull("addressHierarchy", lastReadEventLog.getId());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterIsNull(anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterStartingWith(anyString(), anyString());
@@ -112,7 +112,7 @@ public class EventLogControllerTest {
         List<EventLog> events = eventLogController.getAddressHierarchyEvents(null, null);
 
         verify(eventLogRepository, times(1)).findTop100ByCategoryAndFilterIsNull("addressHierarchy");
-        verify(eventLogRepository, never()).findByUuid(anyString());
+        verify(eventLogRepository, never()).findTop1ByUuid(anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryAndIdAfterAndFilterIsNull(anyString(), anyInt());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterStartingWith(anyString(), anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterStartingWithAndIdAfter(anyString(), anyString(), anyInt());
@@ -126,12 +126,12 @@ public class EventLogControllerTest {
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         EventLog lastReadEventLog = new EventLog();
         lastReadEventLog.setId(1000);
-        when(eventLogRepository.findByUuid(uuid)).thenReturn(lastReadEventLog);
+        when(eventLogRepository.findTop1ByUuid(uuid)).thenReturn(lastReadEventLog);
         when(eventLogRepository.findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy, lastReadEventLog.getId())).thenReturn(eventLogs);
 
         List<EventLog> events = eventLogController.getAddressHierarchyEvents(uuid, filterBy);
 
-        verify(eventLogRepository, times(1)).findByUuid(uuid);
+        verify(eventLogRepository, times(1)).findTop1ByUuid(uuid);
         verify(eventLogRepository, times(1)).findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy, lastReadEventLog.getId());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterIsNull(anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryAndIdAfterAndFilterIsNull(anyString(), anyInt());
@@ -150,7 +150,7 @@ public class EventLogControllerTest {
         List<EventLog> events = eventLogController.getAddressHierarchyEvents(null, filterBy);
 
         verify(eventLogRepository, times(1)).findTop100ByCategoryAndFilterStartingWith("addressHierarchy", filterBy);
-        verify(eventLogRepository, never()).findByUuid(anyString());
+        verify(eventLogRepository, never()).findTop1ByUuid(anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterIsNull(anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryAndIdAfterAndFilterIsNull(anyString(), anyInt());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterStartingWithAndIdAfter(anyString(), anyString(), anyInt());
@@ -168,7 +168,7 @@ public class EventLogControllerTest {
 
 
         verify(eventLogRepository, times(1)).findTop100ByCategoryIs(category);
-        verify(eventLogRepository, never()).findByUuid(anyString());
+        verify(eventLogRepository, never()).findTop1ByUuid(anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryIsAndIdAfter(anyString(), anyInt());
         assertNotNull(events);
     }

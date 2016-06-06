@@ -28,7 +28,7 @@ public class EventLogController {
         if (uuid == null) {
             return eventLogRepository.findTop100ByFilterStartingWithAndCategoryNotIn(filterBy, categoryList);
         }
-        EventLog lastReadEventLog = eventLogRepository.findByUuid(uuid);
+        EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
         return eventLogRepository.findTop100ByFilterStartingWithAndIdAfterAndCategoryNotIn(filterBy, lastReadEventLog.getId(), categoryList);
     }
 
@@ -37,12 +37,12 @@ public class EventLogController {
         if (filterBy == null && uuid == null) {
             return eventLogRepository.findTop100ByCategoryAndFilterIsNull("addressHierarchy");
         }else if (filterBy == null){
-            EventLog lastReadEventLog = eventLogRepository.findByUuid(uuid);
+            EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
             return  eventLogRepository.findTop100ByCategoryAndIdAfterAndFilterIsNull("addressHierarchy", lastReadEventLog.getId());
         }else if (uuid == null){
             return  eventLogRepository.findTop100ByCategoryAndFilterStartingWith("addressHierarchy", filterBy);
         }else{
-            EventLog lastReadEventLog = eventLogRepository.findByUuid(uuid);
+            EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
             return  eventLogRepository.findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy, lastReadEventLog.getId());
         }
     }
@@ -53,7 +53,7 @@ public class EventLogController {
         if (uuid == null) {
             return eventLogRepository.findTop100ByCategoryIs("offline-concepts");
         }
-        EventLog lastReadEventLog = eventLogRepository.findByUuid(uuid);
+        EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
         return eventLogRepository.findTop100ByCategoryIsAndIdAfter("offline-concepts", lastReadEventLog.getId());
     }
 

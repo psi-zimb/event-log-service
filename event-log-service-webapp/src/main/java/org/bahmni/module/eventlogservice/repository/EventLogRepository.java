@@ -30,7 +30,7 @@ public interface EventLogRepository extends JpaRepository<EventLog, Integer> {
 
     List<EventLog> findTop100ByCategoryIsAndIdAfter(@Param("category") String category, @Param("id") Integer id);
 
-    EventLog findByUuid(@Param("uuid") String uuid);
+    EventLog findTop1ByUuid(@Param("uuid") String uuid);
 
     EventLog findFirstByOrderByIdDesc();
 }
