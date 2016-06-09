@@ -13,7 +13,7 @@
     <artifactId>event-log-service-webapp</artifactId>
 
     <properties>
-        <openmrs.version>1.12.0-SNAPSHOT</openmrs.version>
+        <openmrs.version>1.12.0</openmrs.version>
     </properties>
 
     <dependencies>
