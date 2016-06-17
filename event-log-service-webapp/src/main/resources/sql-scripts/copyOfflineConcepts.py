@@ -124,5 +124,7 @@ def getAllObsConceptId() :
         print ""
     return results[0][0]
 
-getAllConcepts(getAllObsConceptId())
+allObsId = getAllObsConceptId()
+concepts.append(allObsId);
+getAllConcepts(allObsIdsql)
 execute()
