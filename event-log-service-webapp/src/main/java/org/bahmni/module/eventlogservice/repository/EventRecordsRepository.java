@@ -16,7 +16,9 @@ public interface EventRecordsRepository extends JpaRepository<EventRecords, Inte
     @Query("select er from EventRecords er where er.timestamp > :timestamp")
     List<EventRecords> findAllEventsAfterTimestamp(@Param("timestamp") Date timestamp);
 
-    List<EventRecords> findTop10ByIdAfter(@Param("id") Integer id);
+        List<EventRecords> findTop100000ByIdAfter(@Param("id") Integer id);
+
+    List<EventRecords> findTop100000ByOrderByIdAsc();
 
     EventRecords findByUuid(@Param("uuid") String uuid);
 }

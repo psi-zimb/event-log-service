@@ -40,13 +40,13 @@ public class EventLogPublisherJob implements Job {
             logger.debug("Reading events which are happened after : " + eventLog.getTimestamp().toString());
             EventRecords eventRecord = eventRecordsRepository.findByUuid(eventLog.getUuid());
             if(eventRecord != null){
-                eventRecords = eventRecordsRepository.findTop10ByIdAfter(eventRecord.getId());
+                eventRecords = eventRecordsRepository.findTop100000ByIdAfter(eventRecord.getId());
             }else{
                 logger.error("Unable to find last read event");
             }
         } else {
             logger.debug("Reading all events from event_records");
-            eventRecords = eventRecordsRepository.findAll();
+            eventRecords = eventRecordsRepository.findTop100000ByOrderByIdAsc();
         }
 
         logger.debug("Found " + eventRecords.size() + " events.");

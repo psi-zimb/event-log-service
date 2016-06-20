@@ -47,7 +47,7 @@ public class EventLogPublisherJobTest {
         eventRecords.setId(12);
         when(eventRecordsRepository.findByUuid("uuid")).thenReturn(eventRecords);
         ArrayList<EventRecords> recordsList = new ArrayList<EventRecords>();
-        when(eventRecordsRepository.findTop10ByIdAfter(eventRecords.getId())).thenReturn(recordsList);
+        when(eventRecordsRepository.findTop100000ByIdAfter(eventRecords.getId())).thenReturn(recordsList);
 
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         when(eventRecordsToEventLogMapper.map(recordsList)).thenReturn(eventLogs);
@@ -55,8 +55,8 @@ public class EventLogPublisherJobTest {
 
         verify(eventLogRepository, times(1)).findFirstByOrderByIdDesc();
         verify(eventRecordsRepository, times(1)).findByUuid("uuid");
-        verify(eventRecordsRepository, times(1)).findTop10ByIdAfter(eventRecords.getId());
-        verify(eventRecordsRepository, times(0)).findAll();
+        verify(eventRecordsRepository, times(1)).findTop100000ByIdAfter(eventRecords.getId());
+        verify(eventRecordsRepository, times(0)).findTop100000ByOrderByIdAsc();
         verify(eventRecordsToEventLogMapper, times(1)).map(recordsList);
         verify(eventLogRepository, times(1)).save(eventLogs);
     }
@@ -66,11 +66,11 @@ public class EventLogPublisherJobTest {
         when(eventLogRepository.findFirstByOrderByTimestampDesc()).thenReturn(null);
 
         List<EventRecords> eventRecords = new ArrayList<EventRecords>();
-        when(eventRecordsRepository.findAll()).thenReturn(eventRecords);
+        when(eventRecordsRepository.findTop100000ByOrderByIdAsc()).thenReturn(eventRecords);
 
         eventLogPublisherJob.process();
 
-        verify(eventRecordsRepository, times(1)).findAll();
+        verify(eventRecordsRepository, times(1)).findTop100000ByOrderByIdAsc();
         verify(eventRecordsRepository, times(0)).findAllEventsAfterTimestamp(any(Date.class));
     }
 
@@ -87,7 +87,7 @@ public class EventLogPublisherJobTest {
         eventLogPublisherJob.process();
 
         verify(eventLogRepository, times(1)).findFirstByOrderByIdDesc();
-        verify(eventRecordsRepository, times(0)).findTop10ByIdAfter(null);
+        verify(eventRecordsRepository, times(0)).findTop100000ByIdAfter(null);
         verify(eventRecordsRepository, times(1)).findByUuid("uuid");
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         verify(eventLogRepository, times(1)).save(eventLogs);
