@@ -126,5 +126,5 @@ def getAllObsConceptId() :
 
 allObsId = getAllObsConceptId()
 concepts.append(allObsId);
-getAllConcepts(allObsIdsql)
+getAllConcepts(allObsId)
 execute()
