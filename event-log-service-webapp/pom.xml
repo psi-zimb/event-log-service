@@ -44,6 +44,31 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bahmni.module</groupId>
+            <artifactId>web-clients</artifactId>
+            <version>0.84-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
         </dependency>
@@ -132,13 +157,13 @@
                     <skip>${skipTests}</skip>
                     <check>
                         <totalBranchRate>91</totalBranchRate>
-                        <totalLineRate>98</totalLineRate>
+                        <totalLineRate>96</totalLineRate>
                         <haltOnFailure>true</haltOnFailure>
                         <regexes>
                             <regex>
                                 <pattern>org.bahmni.module.eventlogservice.mapper.EventRecordsToEventLogMapper</pattern>
                                 <branchRate>81</branchRate>
-                                <lineRate>100</lineRate>
+                                <lineRate>95</lineRate>
                             </regex>
                             <regex>
                                 <pattern>org.bahmni.module.eventlogservice.controller.*</pattern>
@@ -163,6 +188,7 @@
                             <exclude>org/bahmni/module/eventlogservice/repository/**/*.class</exclude>
                             <exclude>org/bahmni/module/eventlogservice/scheduler/*.class</exclude>
                             <exclude>org/bahmni/module/eventlogservice/*.class</exclude>
+                            <exclude>org/bahmni/module/eventlogservice/web/helper/*.class</exclude>
                         </excludes>
                     </instrumentation>
                     <formats>

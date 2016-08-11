@@ -1,20 +1,19 @@
 package org.bahmni.module.eventlogservice.mapper;
 
-import org.bahmni.module.eventlogservice.mapper.filterEvaluators.AddressHierarchyFilterEvaluator;
-import org.bahmni.module.eventlogservice.mapper.filterEvaluators.EncounterFilterEvaluator;
-import org.bahmni.module.eventlogservice.mapper.filterEvaluators.FilterEvaluator;
-import org.bahmni.module.eventlogservice.mapper.filterEvaluators.PatientFilterEvaluator;
-import org.bahmni.module.eventlogservice.model.EventRecords;
 import org.bahmni.module.eventlogservice.model.EventLog;
+import org.bahmni.module.eventlogservice.model.EventRecords;
+import org.bahmni.module.eventlogservice.web.helper.OpenMRSWebClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,32 +22,33 @@ import java.util.regex.Pattern;
 public class EventRecordsToEventLogMapper {
 
     private static final String UUID_PATTERN = "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})";
-    private final HashMap<String, FilterEvaluator> filterEvaluators;
     private JdbcTemplate jdbcTemplate;
     private Pattern pattern;
+    private OpenMRSWebClient openMRSWebClient;
+
+    @Value("${bahmni.filter.uri}")
+    private String bahmniEventLogFilterURL;
 
     @Autowired
-    public EventRecordsToEventLogMapper(PatientFilterEvaluator patientFilterEvaluator, EncounterFilterEvaluator encounterFilterEvaluator, AddressHierarchyFilterEvaluator addressHierarchyFilterEvaluator, JdbcTemplate jdbcTemplate) {
-        filterEvaluators = new HashMap<String, FilterEvaluator>();
-        filterEvaluators.put("patient", patientFilterEvaluator);
-        filterEvaluators.put("Encounter", encounterFilterEvaluator);
-        filterEvaluators.put("addressHierarchy", addressHierarchyFilterEvaluator);
-        filterEvaluators.put("SHREncounter", encounterFilterEvaluator);
+    public EventRecordsToEventLogMapper(JdbcTemplate jdbcTemplate, OpenMRSWebClient openMRSWebClient) {
+        this.openMRSWebClient = openMRSWebClient;
         pattern = Pattern.compile(UUID_PATTERN);
         this.jdbcTemplate = jdbcTemplate;
     }
+
 
     public List<EventLog> map(List<EventRecords> eventRecords) {
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         for (EventRecords eventRecord : eventRecords) {
             EventLog eventLog = new EventLog(eventRecord.getUuid(), eventRecord.getTimestamp(), eventRecord.getObject(), eventRecord.getCategory(), null);
-            evaluateFilter(eventRecord, eventLog);
+            if(!eventRecord.getCategory().contains("concepts"))
+                evaluateFilter(eventLog);
             if ((eventRecord.getCategory().equalsIgnoreCase("all-concepts"))) {
                 if(isOfflineConceptEvent(getConceptUuidFromUrl(eventLog.getObject()))){
                     eventLog.setCategory("offline-concepts");
                 }
                 else {
-                    eventLog.setCategory("concepts");;
+                    eventLog.setCategory("concepts");
                 }
             }
             eventLogs.add(eventLog);
@@ -72,12 +72,32 @@ public class EventRecordsToEventLogMapper {
         return eventUrl.substring(eventUrl.indexOf(searchTerm) + searchTerm.length(), eventUrl.indexOf("?"));
     }
 
-    private void evaluateFilter(EventRecords eventRecord, EventLog eventLog) {
-        String object = eventRecord.getObject();
-        Matcher matcher = pattern.matcher(object);
-        if (matcher.find() && filterEvaluators.get(eventRecord.getCategory()) != null) {
-            filterEvaluators.get(eventRecord.getCategory()).evaluateFilter(matcher.group(0), eventLog);
+    private void evaluateFilter(EventLog eventLog) {
+        URI uri = bahmniFilterURL(eventLog);
+        if(uri != null) {
+            String response = openMRSWebClient.get(uri);
+            if (response != null && !response.isEmpty())
+                eventLog.setFilter(response);
         }
+    }
+
+    private URI  bahmniFilterURL(EventLog eventLog) {
+        String object = eventLog.getObject();
+        String url = "";
+        Matcher matcher = pattern.matcher(object);
+        URI uri = null;
+        if (matcher.find()) {
+            String uuid = matcher.group(0);
+            url = bahmniEventLogFilterURL + eventLog.getCategory() + "/" + uuid;
+        }
+        if(!url.isEmpty()) {
+            try {
+                uri = new URI(url);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+        return uri;
     }
 
     class ConceptRowMapper implements RowMapper {
@@ -85,5 +105,9 @@ public class EventRecordsToEventLogMapper {
         public Object mapRow(ResultSet resultSet, int i) throws SQLException {
             return resultSet.getInt(1);
         }
+    }
+
+    protected void setBahmniEventLogFilterURL(String bahmniEventLogFilterURL) {
+        this.bahmniEventLogFilterURL = bahmniEventLogFilterURL;
     }
 }
