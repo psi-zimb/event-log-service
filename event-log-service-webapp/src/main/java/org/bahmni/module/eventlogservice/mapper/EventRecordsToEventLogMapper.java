@@ -1,7 +1,9 @@
 package org.bahmni.module.eventlogservice.mapper;
 
+import org.apache.log4j.Logger;
 import org.bahmni.module.eventlogservice.model.EventLog;
 import org.bahmni.module.eventlogservice.model.EventRecords;
+import org.bahmni.module.eventlogservice.scheduler.ScheduledTasks;
 import org.bahmni.module.eventlogservice.web.helper.OpenMRSWebClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +30,8 @@ public class EventRecordsToEventLogMapper {
 
     @Value("${bahmni.filter.uri}")
     private String bahmniEventLogFilterURL;
+
+    private static Logger logger = Logger.getLogger(ScheduledTasks.class);
 
     @Autowired
     public EventRecordsToEventLogMapper(JdbcTemplate jdbcTemplate, OpenMRSWebClient openMRSWebClient) {
@@ -95,6 +99,7 @@ public class EventRecordsToEventLogMapper {
                 uri = new URI(url);
             } catch (URISyntaxException e) {
                 e.printStackTrace();
+                logger.error("Invalid url to for event log filter : "+ url);
             }
         }
         return uri;
