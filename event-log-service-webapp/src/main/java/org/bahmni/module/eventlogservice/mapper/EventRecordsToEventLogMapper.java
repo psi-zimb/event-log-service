@@ -98,8 +98,7 @@ public class EventRecordsToEventLogMapper {
             try {
                 uri = new URI(url);
             } catch (URISyntaxException e) {
-                e.printStackTrace();
-                logger.error("Invalid url to for event log filter : "+ url);
+                throw new RuntimeException("Invalid url for event log filter : "+ url, e);
             }
         }
         return uri;

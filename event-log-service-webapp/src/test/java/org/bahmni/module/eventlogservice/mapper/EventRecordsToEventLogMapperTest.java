@@ -223,4 +223,18 @@ public class EventRecordsToEventLogMapperTest {
         assertEquals(eventRecord.getCategory(), eventLogs.get(0).getCategory());
         assertNull(eventLog.getFilter());
     }
+
+
+    @Test(expected = RuntimeException.class)
+    public void shouldThrowExceptionWhenUrlForEventLogFilterIsNotValid() throws Exception {
+        ArrayList<EventRecords> eventRecords = new ArrayList<EventRecords>();
+        EventRecords eventRecord = new EventRecords("uuid", "title", TIMESTAMP, "uri", "d95bf6c9-d1c6-41dc-aecf-1c06bd71358c''`", "`");
+        eventRecords.add(eventRecord);
+        EventLog eventLog = new EventLog("uuid", TIMESTAMP, "d95bf6c9-d1c6-41dc-aecf-1c06bd71358c''`", "`", null);
+        PowerMockito.whenNew(EventLog.class).withAnyArguments().thenReturn(eventLog);
+        when(openMRSWebClient.get(any(URI.class))).thenReturn("");
+        eventRecordsToEventLogMapper.map(eventRecords);
+
+
+    }
 }
