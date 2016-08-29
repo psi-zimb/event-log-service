@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
@@ -29,21 +30,23 @@ public class EventLogControllerTest {
     @Test
     public void shouldGetEventLogExcludingCategories() throws Exception {
         String uuid = "uuid1";
-        String filterBy = "303020";
+        String[] filterBy = new String[]{"0303020","30302001"};
+        List<String> filtersList = Arrays.asList(filterBy);
+
         List<String> categoryList = new ArrayList<String>();
         categoryList.add("addressHierarchy");
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         EventLog lastReadEventLog = new EventLog();
         lastReadEventLog.setId(1000);
         when(eventLogRepository.findTop1ByUuid(uuid)).thenReturn(lastReadEventLog);
-        when(eventLogRepository.findTop100ByFilterStartingWithAndIdAfterAndCategoryNotIn(filterBy, lastReadEventLog.getId(), categoryList)).thenReturn(eventLogs);
+        when(eventLogRepository.findTop100ByFilterInAndIdAfterAndCategoryNotIn(filtersList, lastReadEventLog.getId(), categoryList)).thenReturn(eventLogs);
 
         List<EventLog> events = eventLogController.getEvents(uuid, filterBy);
 
 
         verify(eventLogRepository, times(1)).findTop1ByUuid(uuid);
-        verify(eventLogRepository, times(1)).findTop100ByFilterStartingWithAndIdAfterAndCategoryNotIn(filterBy, lastReadEventLog.getId(), categoryList);
-        verify(eventLogRepository, never()).findTop100ByFilterStartingWithAndCategoryNotIn(anyString(), anyList());
+        verify(eventLogRepository, times(1)).findTop100ByFilterInAndIdAfterAndCategoryNotIn(filtersList, lastReadEventLog.getId(), categoryList);
+        verify(eventLogRepository, never()).findTop100ByFilterInAndCategoryNotIn(any(List.class), anyList());
         assertNotNull(events);
     }
 
@@ -68,18 +71,19 @@ public class EventLogControllerTest {
 
     @Test
     public void shouldGetAllEventLogExcludingCategoriesForTheFirstTime() throws Exception {
-        String filterBy = "303020";
+        String[] filterBy = new String[]{"0303020","30302001"};
+        List<String> filtersList = Arrays.asList(filterBy);
         List<String> categoryList = new ArrayList<String>();
         categoryList.add("addressHierarchy");
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
-        when(eventLogRepository.findTop100ByFilterStartingWithAndCategoryNotIn(filterBy, categoryList)).thenReturn(eventLogs);
+        when(eventLogRepository.findTop100ByFilterInAndCategoryNotIn(filtersList, categoryList)).thenReturn(eventLogs);
 
         List<EventLog> events = eventLogController.getEvents(null, filterBy);
 
 
-        verify(eventLogRepository, times(1)).findTop100ByFilterStartingWithAndCategoryNotIn(filterBy, categoryList);
+        verify(eventLogRepository, times(1)).findTop100ByFilterInAndCategoryNotIn(filtersList, categoryList);
         verify(eventLogRepository, never()).findTop1ByUuid(anyString());
-        verify(eventLogRepository, never()).findTop100ByFilterStartingWithAndIdAfterAndCategoryNotIn(anyString(), anyInt(), anyList());
+        verify(eventLogRepository, never()).findTop100ByFilterInAndIdAfterAndCategoryNotIn(any(List.class), anyInt(), anyList());
         assertNotNull(events);
     }
 
@@ -122,17 +126,18 @@ public class EventLogControllerTest {
     @Test
     public void shouldGetEventForSpecificCategoryWithFilterStartingWith() throws Exception {
         String uuid = "uuid1";
-        String filterBy = "303020";
+        String[] filterBy = new String[]{"0303020"};
+        List<String> filtersList = Arrays.asList(filterBy);
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         EventLog lastReadEventLog = new EventLog();
         lastReadEventLog.setId(1000);
         when(eventLogRepository.findTop1ByUuid(uuid)).thenReturn(lastReadEventLog);
-        when(eventLogRepository.findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy, lastReadEventLog.getId())).thenReturn(eventLogs);
+        when(eventLogRepository.findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy[0], lastReadEventLog.getId())).thenReturn(eventLogs);
 
         List<EventLog> events = eventLogController.getAddressHierarchyEvents(uuid, filterBy);
 
         verify(eventLogRepository, times(1)).findTop1ByUuid(uuid);
-        verify(eventLogRepository, times(1)).findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy, lastReadEventLog.getId());
+        verify(eventLogRepository, times(1)).findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy[0], lastReadEventLog.getId());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterIsNull(anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryAndIdAfterAndFilterIsNull(anyString(), anyInt());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterStartingWith(anyString(), anyString());
@@ -144,10 +149,11 @@ public class EventLogControllerTest {
     @Test
     public void shouldGetEventForSpecificCategoryWithFilterStartingWithForFirstTime() throws Exception {
         String filterBy = "303020";
+        String[] filters = new String[]{filterBy};
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         when(eventLogRepository.findTop100ByCategoryAndFilterStartingWith("addressHierarchy", filterBy)).thenReturn(eventLogs);
 
-        List<EventLog> events = eventLogController.getAddressHierarchyEvents(null, filterBy);
+        List<EventLog> events = eventLogController.getAddressHierarchyEvents(null, filters);
 
         verify(eventLogRepository, times(1)).findTop100ByCategoryAndFilterStartingWith("addressHierarchy", filterBy);
         verify(eventLogRepository, never()).findTop1ByUuid(anyString());
@@ -171,5 +177,9 @@ public class EventLogControllerTest {
         verify(eventLogRepository, never()).findTop1ByUuid(anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryIsAndIdAfter(anyString(), anyInt());
         assertNotNull(events);
+    }
+    @Test(expected = RuntimeException.class)
+    public void shouldThrowExceptionWhenFilterByHasMultipleFilters() throws Exception {
+        List<EventLog> events = eventLogController.getAddressHierarchyEvents("uuid3", new String[]{"2020", "202020"});
     }
 }

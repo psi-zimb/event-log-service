@@ -21,8 +21,9 @@ public class EventLogControllerIT extends BaseIntegrationTest {
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
     })
     @Test
-    public void shouldGetAllEventLogsByFilterStartingWithAndCategoryNotIn() throws Exception {
-        List<EventLog> events = eventLogController.getEvents(null, "2020");
+    public void shouldGetAllEventLogsByFilterInAndCategoryNotIn() throws Exception {
+
+        List<EventLog> events = eventLogController.getEvents(null, new String[]{"2020","202020"});
 
         assertNotNull(events);
         assertEquals(3, events.size());
@@ -33,8 +34,8 @@ public class EventLogControllerIT extends BaseIntegrationTest {
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
     })
     @Test
-    public void shouldGetAllEventsAfterUuidAndByFilterStartingWithAndCategoryNotIn() throws Exception {
-        List<EventLog> events = eventLogController.getEvents("uuid8", "2020");
+    public void shouldGetAllEventsAfterUuidAndByFilterInAndCategoryNotIn() throws Exception {
+        List<EventLog> events = eventLogController.getEvents("uuid8", new String[]{"2020","202020"});
 
         assertNotNull(events);
         assertEquals(2, events.size());
@@ -72,7 +73,7 @@ public class EventLogControllerIT extends BaseIntegrationTest {
     })
     @Test
     public void shouldGetAllEventLogsByCategoryAndFilterStartingWith() throws Exception {
-        List<EventLog> events = eventLogController.getAddressHierarchyEvents(null, "2020");
+        List<EventLog> events = eventLogController.getAddressHierarchyEvents(null, new String[]{"2020"});
 
         assertNotNull(events);
         assertEquals(5, events.size());
@@ -97,7 +98,7 @@ public class EventLogControllerIT extends BaseIntegrationTest {
     })
     @Test
     public void shouldGetAllEventLogsAfterUuidByCategoryAndFilterStartingWith() throws Exception {
-        List<EventLog> events = eventLogController.getAddressHierarchyEvents("uuid3", "2020");
+        List<EventLog> events = eventLogController.getAddressHierarchyEvents("uuid3", new String[]{"2020"});
 
         assertNotNull(events);
         assertEquals(2, events.size());
@@ -115,6 +116,13 @@ public class EventLogControllerIT extends BaseIntegrationTest {
         assertEquals(4, events.size());
     }
 
-
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:testDataSet/eventLogController/insertEventLogs.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
+    })
+    @Test(expected = RuntimeException.class)
+    public void shouldThrowExceptionWhenFilterByHasMultipleFilters() throws Exception {
+        List<EventLog> events = eventLogController.getAddressHierarchyEvents("uuid3", new String[]{"2020", "202020"});
+       }
 
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -22,28 +23,32 @@ public class EventLogController {
     }
 
     @RequestMapping(value = "/events", method = RequestMethod.GET)
-    public List<EventLog> getEvents(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = true) String filterBy) {
+    public List<EventLog> getEvents(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = true) String[] filterBy) {
         List<String> categoryList = new ArrayList<String>();
         categoryList.add("addressHierarchy");
         if (uuid == null) {
-            return eventLogRepository.findTop100ByFilterStartingWithAndCategoryNotIn(filterBy, categoryList);
+            return eventLogRepository.findTop100ByFilterInAndCategoryNotIn(Arrays.asList(filterBy), categoryList);
         }
         EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
-        return eventLogRepository.findTop100ByFilterStartingWithAndIdAfterAndCategoryNotIn(filterBy, lastReadEventLog.getId(), categoryList);
+
+        return eventLogRepository.findTop100ByFilterInAndIdAfterAndCategoryNotIn( Arrays.asList(filterBy), lastReadEventLog.getId(), categoryList);
     }
 
     @RequestMapping(value = "/getAddressHierarchyEvents", method = RequestMethod.GET)
-    public List<EventLog> getAddressHierarchyEvents(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = false) String filterBy) {
+        public List<EventLog> getAddressHierarchyEvents(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = false) String[] filterBy) {
+        if(filterBy != null && filterBy.length > 1){
+            throw new RuntimeException("Address hierarchy events should have only one filter!!");
+        }
         if (filterBy == null && uuid == null) {
             return eventLogRepository.findTop100ByCategoryAndFilterIsNull("addressHierarchy");
         }else if (filterBy == null){
             EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
             return  eventLogRepository.findTop100ByCategoryAndIdAfterAndFilterIsNull("addressHierarchy", lastReadEventLog.getId());
         }else if (uuid == null){
-            return  eventLogRepository.findTop100ByCategoryAndFilterStartingWith("addressHierarchy", filterBy);
+            return  eventLogRepository.findTop100ByCategoryAndFilterStartingWith("addressHierarchy", filterBy[0]);
         }else{
             EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
-            return  eventLogRepository.findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy, lastReadEventLog.getId());
+            return  eventLogRepository.findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy[0], lastReadEventLog.getId());
         }
     }
 
