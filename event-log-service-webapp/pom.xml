@@ -161,17 +161,12 @@
                         <haltOnFailure>true</haltOnFailure>
                         <regexes>
                             <regex>
-                                <pattern>org.bahmni.module.eventlogservice.mapper.EventRecordsToEventLogMapper</pattern>
+                                <pattern>org.bahmni.module.eventlogservice.fetcher.EventLogFetcher</pattern>
                                 <branchRate>81</branchRate>
                                 <lineRate>95</lineRate>
                             </regex>
                             <regex>
                                 <pattern>org.bahmni.module.eventlogservice.controller.*</pattern>
-                                <branchRate>100</branchRate>
-                                <lineRate>100</lineRate>
-                            </regex>
-                            <regex>
-                                <pattern>org.bahmni.module.eventlogservice.mapper.filterEvaluators.*</pattern>
                                 <branchRate>100</branchRate>
                                 <lineRate>100</lineRate>
                             </regex>

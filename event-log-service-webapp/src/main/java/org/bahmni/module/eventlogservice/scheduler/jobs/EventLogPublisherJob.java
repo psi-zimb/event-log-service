@@ -1,57 +1,46 @@
 package org.bahmni.module.eventlogservice.scheduler.jobs;
 
 import org.apache.log4j.Logger;
-import org.bahmni.module.eventlogservice.mapper.EventRecordsToEventLogMapper;
-import org.bahmni.module.eventlogservice.model.EventRecords;
+import org.bahmni.module.eventlogservice.fetcher.EventLogFetcher;
 import org.bahmni.module.eventlogservice.model.EventLog;
-import org.bahmni.module.eventlogservice.repository.EventRecordsRepository;
 import org.bahmni.module.eventlogservice.repository.EventLogRepository;
 import org.quartz.DisallowConcurrentExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
 @DisallowConcurrentExecution
 @Component("eventLogPublisherJob")
 @ConditionalOnExpression("'${enable.scheduling}'=='true'")
 public class EventLogPublisherJob implements Job {
-    private EventRecordsRepository eventRecordsRepository;
     private EventLogRepository eventLogRepository;
-    private EventRecordsToEventLogMapper eventRecordsToEventLogMapper;
+    private EventLogFetcher eventLogFetcher;
 
     private static Logger logger = Logger.getLogger(EventLogPublisherJob.class);
 
     @Autowired
-    public EventLogPublisherJob(EventRecordsRepository eventRecordsRepository, EventLogRepository eventLogRepository, EventRecordsToEventLogMapper eventRecordsToEventLogMapper) {
-        this.eventRecordsRepository = eventRecordsRepository;
+    public EventLogPublisherJob(EventLogRepository eventLogRepository, EventLogFetcher eventLogFetcher) {
         this.eventLogRepository = eventLogRepository;
-        this.eventRecordsToEventLogMapper = eventRecordsToEventLogMapper;
+        this.eventLogFetcher = eventLogFetcher;
     }
 
     @Override
     public void process() throws InterruptedException {
         EventLog eventLog = eventLogRepository.findFirstByOrderByIdDesc();
-        List<EventRecords> eventRecords = new ArrayList<EventRecords>();
-
-        if (eventLog != null) {
-            logger.debug("Reading events which are happened after : " + eventLog.getTimestamp().toString());
-            EventRecords eventRecord = eventRecordsRepository.findByUuid(eventLog.getUuid());
-            if(eventRecord != null){
-                eventRecords = eventRecordsRepository.findTop100000ByIdAfter(eventRecord.getId());
-            }else{
-                logger.error("Unable to find last read event");
-            }
-        } else {
-            logger.debug("Reading all events from event_records");
-            eventRecords = eventRecordsRepository.findTop100000ByOrderByIdAsc();
+        List<EventLog> eventLogs;
+        String lastReadEventUuid = eventLog != null ? eventLog.getUuid(): "";
+        logger.debug("Reading events which happened after event with uuid: " + lastReadEventUuid);
+        try {
+            eventLogs = eventLogFetcher.fetchEventLogsAfter(lastReadEventUuid);
+        } catch (IOException e) {
+            logger.error(e);
+            throw new RuntimeException(e);
         }
-
-        logger.debug("Found " + eventRecords.size() + " events.");
-        List<EventLog> eventLogs = eventRecordsToEventLogMapper.map(eventRecords);
+        logger.debug("Found " + eventLogs.size() + " events.");
         eventLogRepository.save(eventLogs);
-        logger.debug("Copied " + eventRecords.size() + " events to events_log table");
+        logger.debug("Copied " + eventLogs.size() + " events to events_log table");
     }
 }

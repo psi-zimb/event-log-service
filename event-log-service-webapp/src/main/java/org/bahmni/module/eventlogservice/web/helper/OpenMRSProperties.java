@@ -16,7 +16,7 @@ public class OpenMRSProperties {
     @Value("${openmrs.password}")
     private String openmrsPassword;
 
-    @Value("${bahmni.filter.uri}")
+    @Value("${bahmni.eventlog.uri}")
     private String bahmniEventLogFilterURL;
 
     @Value("${openmrs.connectionTimeoutInMilliseconds}")

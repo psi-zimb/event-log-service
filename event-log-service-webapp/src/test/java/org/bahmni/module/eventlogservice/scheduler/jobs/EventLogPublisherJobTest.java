@@ -1,14 +1,13 @@
 package org.bahmni.module.eventlogservice.scheduler.jobs;
 
-import org.bahmni.module.eventlogservice.mapper.EventRecordsToEventLogMapper;
-import org.bahmni.module.eventlogservice.model.EventRecords;
+import org.bahmni.module.eventlogservice.fetcher.EventLogFetcher;
 import org.bahmni.module.eventlogservice.model.EventLog;
-import org.bahmni.module.eventlogservice.repository.EventRecordsRepository;
 import org.bahmni.module.eventlogservice.repository.EventLogRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,19 +18,17 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 
 public class EventLogPublisherJobTest {
-    private Job eventLogPublisherJob;
 
-    @Mock
-    private EventRecordsRepository eventRecordsRepository;
+    private Job eventLogPublisherJob;
     @Mock
     private EventLogRepository eventLogRepository;
     @Mock
-    private EventRecordsToEventLogMapper eventRecordsToEventLogMapper;
+    private EventLogFetcher eventLogFetcher;
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        eventLogPublisherJob = new EventLogPublisherJob(eventRecordsRepository, eventLogRepository, eventRecordsToEventLogMapper);
+        eventLogPublisherJob = new EventLogPublisherJob(eventLogRepository, eventLogFetcher);
     }
 
     @Test
@@ -43,21 +40,15 @@ public class EventLogPublisherJobTest {
         when(eventLogRepository.findFirstByOrderByIdDesc()).thenReturn(eventLog);
 
 
-        EventRecords eventRecords = new EventRecords();
-        eventRecords.setId(12);
-        when(eventRecordsRepository.findByUuid("uuid")).thenReturn(eventRecords);
-        ArrayList<EventRecords> recordsList = new ArrayList<EventRecords>();
-        when(eventRecordsRepository.findTop100000ByIdAfter(eventRecords.getId())).thenReturn(recordsList);
-
+        EventLog eventLogNew = new EventLog();
+        eventLogNew.setId(12);
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
-        when(eventRecordsToEventLogMapper.map(recordsList)).thenReturn(eventLogs);
+        eventLogs.add(eventLogNew);
+        when(eventLogFetcher.fetchEventLogsAfter(eventLog.getUuid())).thenReturn(eventLogs);
         eventLogPublisherJob.process();
 
         verify(eventLogRepository, times(1)).findFirstByOrderByIdDesc();
-        verify(eventRecordsRepository, times(1)).findByUuid("uuid");
-        verify(eventRecordsRepository, times(1)).findTop100000ByIdAfter(eventRecords.getId());
-        verify(eventRecordsRepository, times(0)).findTop100000ByOrderByIdAsc();
-        verify(eventRecordsToEventLogMapper, times(1)).map(recordsList);
+        verify(eventLogFetcher, times(1)).fetchEventLogsAfter(eventLog.getUuid());
         verify(eventLogRepository, times(1)).save(eventLogs);
     }
 
@@ -65,13 +56,17 @@ public class EventLogPublisherJobTest {
     public void shouldCopyAllEventRecordsForTheFirstTime() throws Exception {
         when(eventLogRepository.findFirstByOrderByTimestampDesc()).thenReturn(null);
 
-        List<EventRecords> eventRecords = new ArrayList<EventRecords>();
-        when(eventRecordsRepository.findTop100000ByOrderByIdAsc()).thenReturn(eventRecords);
+        EventLog eventLogNew = new EventLog();
+        eventLogNew.setId(12);
+        ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
+        eventLogs.add(eventLogNew);
+        when(eventLogFetcher.fetchEventLogsAfter("")).thenReturn(eventLogs);
 
         eventLogPublisherJob.process();
+        verify(eventLogRepository, times(1)).findFirstByOrderByIdDesc();
+        verify(eventLogFetcher, times(1)).fetchEventLogsAfter("");
+        verify(eventLogRepository, times(1)).save(eventLogs);
 
-        verify(eventRecordsRepository, times(1)).findTop100000ByOrderByIdAsc();
-        verify(eventRecordsRepository, times(0)).findAllEventsAfterTimestamp(any(Date.class));
     }
 
     @Test
@@ -81,15 +76,27 @@ public class EventLogPublisherJobTest {
         eventLog.setUuid("uuid");
         eventLog.setTimestamp(timestamp);
         when(eventLogRepository.findFirstByOrderByIdDesc()).thenReturn(eventLog);
-        EventRecords eventRecords =null;
-        when(eventRecordsRepository.findByUuid("uuid")).thenReturn(null);
+        List<EventLog> eventLogs = new ArrayList<EventLog>();
+        when(eventLogFetcher.fetchEventLogsAfter("uuid")).thenReturn(eventLogs);
 
         eventLogPublisherJob.process();
 
         verify(eventLogRepository, times(1)).findFirstByOrderByIdDesc();
-        verify(eventRecordsRepository, times(0)).findTop100000ByIdAfter(null);
-        verify(eventRecordsRepository, times(1)).findByUuid("uuid");
-        ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
+        verify(eventLogFetcher, times(1)).fetchEventLogsAfter("uuid");
         verify(eventLogRepository, times(1)).save(eventLogs);
     }
+
+    @Test(expected = RuntimeException.class)
+    public void shouldThrowErrorWhenMapperThrowIOException() throws Exception {
+        Date timestamp = new Date();
+        EventLog eventLog = new EventLog();
+        eventLog.setUuid("uuid");
+        eventLog.setTimestamp(timestamp);
+        when(eventLogRepository.findFirstByOrderByIdDesc()).thenReturn(eventLog);
+        List<EventLog> eventLogs = new ArrayList<EventLog>();
+        when(eventLogFetcher.fetchEventLogsAfter("uuid")).thenThrow(new IOException());
+
+        eventLogPublisherJob.process();
+    }
+
 }
