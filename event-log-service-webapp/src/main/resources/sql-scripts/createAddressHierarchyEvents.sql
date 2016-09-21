@@ -9,5 +9,5 @@ Insert into event_records(uuid,
      '1970-01-01 00:00:01',
      concat('/openmrs/ws/rest/v1/addressHierarchy/',uuid),
      concat('/openmrs/ws/rest/v1/addressHierarchy/',uuid),
-     'AddressHierarchy'
+     'addressHierarchy'
    from address_hierarchy_entry);
