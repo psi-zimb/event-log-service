@@ -27,12 +27,20 @@ public class EventLog {
     @Column(name = "filter")
     private String filter;
 
-    public EventLog(String uuid, Date timestamp, String object, String category, String filter) {
+    public void setParentUuid(String parentUuid) {
+        this.parentUuid = parentUuid;
+    }
+
+    @Column(name = "parent_uuid")
+    private String parentUuid;
+
+    public EventLog(String uuid, Date timestamp, String object, String category, String filter, String parentUuid) {
         this.uuid = uuid;
         this.timestamp = timestamp;
         this.object = object;
         this.category = category;
         this.filter = filter;
+        this.parentUuid = parentUuid;
     }
 
     public EventLog() {
@@ -84,5 +92,9 @@ public class EventLog {
 
     public void setFilter(String filter) {
         this.filter = filter;
+    }
+
+    public String getParentUuid() {
+        return parentUuid;
     }
 }

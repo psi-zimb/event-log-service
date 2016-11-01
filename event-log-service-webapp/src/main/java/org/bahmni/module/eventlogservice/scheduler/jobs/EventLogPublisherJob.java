@@ -10,7 +10,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @DisallowConcurrentExecution
 @Component("eventLogPublisherJob")
@@ -30,16 +32,38 @@ public class EventLogPublisherJob implements Job {
     @Override
     public void process() throws InterruptedException {
         EventLog eventLog = eventLogRepository.findFirstByOrderByIdDesc();
-        List<EventLog> eventLogs;
-        String lastReadEventUuid = eventLog != null ? eventLog.getUuid(): "";
+        List<EventLog> eventLogs = new ArrayList<EventLog>();
+        String lastReadEventUuid = eventLog != null ? eventLog.getParentUuid(): "";
         logger.debug("Reading events which happened after event with uuid: " + lastReadEventUuid);
         try {
-            eventLogs = eventLogFetcher.fetchEventLogsAfter(lastReadEventUuid);
+            eventLogs.addAll(eventLogFetcher.fetchEventLogsAfter(lastReadEventUuid));
         } catch (IOException e) {
             logger.error(e);
             throw new RuntimeException(e);
         }
         logger.debug("Found " + eventLogs.size() + " events.");
+        Map<String,EventLog> eventRecordUuidsWithNewFilter = new HashMap<String, EventLog>();
+            for(EventLog event : eventLogs){
+            if(event.getCategory().equals("patient")){
+                  EventLog recentPatientEvent = eventLogRepository.findTop1ByCategoryAndObjectOrderByIdDesc(event.getCategory(),event.getObject());
+                if(recentPatientEvent != null && !recentPatientEvent.getFilter().equals(event.getFilter()))
+                    eventRecordUuidsWithNewFilter.put(event.getParentUuid(),event);
+
+            }
+        }
+
+        try {
+            if(!eventRecordUuidsWithNewFilter.keySet().isEmpty()) {
+                List<EventLog> eventsWithNewFilter = eventLogFetcher.fetchEventLogsForFilterChange(eventRecordUuidsWithNewFilter.keySet());
+                for(EventLog event : eventsWithNewFilter){
+                    event.setFilter(eventRecordUuidsWithNewFilter.get(event.getParentUuid()).getFilter());
+                    eventLogs.add(eventLogs.indexOf(eventRecordUuidsWithNewFilter.get(event.getParentUuid()))+1, event);
+                }
+            }
+        } catch (IOException e) {
+            logger.error(e);
+            throw new RuntimeException(e);
+        }
         eventLogRepository.save(eventLogs);
         logger.debug("Copied " + eventLogs.size() + " events to events_log table");
     }

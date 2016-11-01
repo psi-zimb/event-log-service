@@ -6,12 +6,15 @@ import org.bahmni.module.eventlogservice.web.helper.OpenMRSWebClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class EventLogFetcher {
@@ -21,15 +24,26 @@ public class EventLogFetcher {
     @Value("${bahmni.eventlog.uri}")
     private String bahmniEventLogURL;
 
-
     @Autowired
     public EventLogFetcher(OpenMRSWebClient openMRSWebClient) {
         this.openMRSWebClient = openMRSWebClient;
 
     }
 
+
     public List<EventLog> fetchEventLogsAfter(String lastReadEventUuid) throws IOException {
         URI uri = constructBahmniURLForEventLogs(lastReadEventUuid);
+        ObjectMapper objectMapper = new ObjectMapper();
+        EventLog[] eventLogs = objectMapper.readValue(openMRSWebClient.get(uri), EventLog[].class);
+        return Arrays.asList(eventLogs);
+    }
+
+    public List<EventLog> fetchEventLogsForFilterChange(Set<String> eventRecordUuidsWithFilterChange) throws IOException {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(bahmniEventLogURL + "getEventsWithNewFilterForPatients");
+        for(String uuid : eventRecordUuidsWithFilterChange){
+            builder.queryParam("eventRecordUuid", uuid);
+        }
+        URI uri = builder.build().toUri();
         ObjectMapper objectMapper = new ObjectMapper();
         EventLog[] eventLogs = objectMapper.readValue(openMRSWebClient.get(uri), EventLog[].class);
         return Arrays.asList(eventLogs);
@@ -49,4 +63,5 @@ public class EventLogFetcher {
     protected void setBahmniEventLogURL(String bahmniEventLogURL) {
         this.bahmniEventLogURL = bahmniEventLogURL;
     }
+
 }

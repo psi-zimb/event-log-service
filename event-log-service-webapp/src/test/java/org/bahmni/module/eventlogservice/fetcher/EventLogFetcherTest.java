@@ -17,9 +17,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -55,7 +53,7 @@ public class EventLogFetcherTest {
         eventLogFetcher.setBahmniEventLogURL("bahmniEventLogURL/");
 
         String lastReadEventUuid = "uuid";
-        EventLog eventLog = new EventLog("uuid1",new Date(),"patientURL","Patient","202020");
+        EventLog eventLog = new EventLog("uuid1",new Date(),"patientURL","Patient","202020", null);
         EventLog[] eventLogs = new EventLog[]{eventLog};
         when(openMRSWebClient.get(any(URI.class))).thenReturn(new ObjectMapper().writeValueAsString(eventLogs));
         List<EventLog> actualEventLogList = eventLogFetcher.fetchEventLogsAfter(lastReadEventUuid);
@@ -67,7 +65,7 @@ public class EventLogFetcherTest {
     public void shouldFetchEventLogsWhenLastReadUuidIsNull() throws Exception {
         eventLogFetcher.setBahmniEventLogURL("bahmniEventLogURL/");
         List<EventLog> eventLogs = new ArrayList<EventLog>();
-        EventLog eventLog = new EventLog("uuid1",new Date(),"patientURL","Patient","202020");
+        EventLog eventLog = new EventLog("uuid1",new Date(),"patientURL","Patient","202020", null);
         eventLogs.add(eventLog);
         when(openMRSWebClient.get(any(URI.class))).thenReturn(new ObjectMapper().writeValueAsString(eventLogs));
         List<EventLog> actualEventLogList = eventLogFetcher.fetchEventLogsAfter(null);
@@ -79,7 +77,7 @@ public class EventLogFetcherTest {
     public void shouldThrowExceptionWhenUriIsInvalid() throws Exception {
         eventLogFetcher.setBahmniEventLogURL(null);
         List<EventLog> eventLogs = new ArrayList<EventLog>();
-        EventLog eventLog = new EventLog("`invalid``",new Date(),"patientURL","Patient","202020");
+        EventLog eventLog = new EventLog("`invalid``",new Date(),"patientURL","Patient","202020", null);
         eventLogs.add(eventLog);
         when(openMRSWebClient.get(any(URI.class))).thenReturn(new ObjectMapper().writeValueAsString(eventLogs));
         eventLogFetcher.fetchEventLogsAfter(eventLog.getUuid());
@@ -89,10 +87,29 @@ public class EventLogFetcherTest {
     public void shouldThrowRuntimeExceptionWhenObjectMapperThrowsException() throws Exception {
         eventLogFetcher.setBahmniEventLogURL("bahmniEventLogURL/");
         List<EventLog> eventLogs = new ArrayList<EventLog>();
-        EventLog eventLog = new EventLog("uuid",new Date(),"patientURL","Patient","202020");
+        EventLog eventLog = new EventLog("uuid",new Date(),"patientURL","Patient","202020", null);
         eventLogs.add(eventLog);
         when(openMRSWebClient.get(any(URI.class))).thenThrow(new IOException());
         eventLogFetcher.fetchEventLogsAfter(eventLog.getUuid());
+    }
+
+    @Test
+    public void shouldFetchEventLogsFromForPatientsWithFilterChange() throws Exception {
+        eventLogFetcher.setBahmniEventLogURL("http://192.168.33.10/openmrs");
+        Set<String> eventRecordUuids = new HashSet<String>();
+        eventRecordUuids.add("UUID1");
+        eventRecordUuids.add("UUID2");
+        eventRecordUuids.add("UUID3");
+
+        List<EventLog> eventLogs = new ArrayList<EventLog>();
+        EventLog eventLog = new EventLog("uuid",new Date(),"patientURL","Encounter","202020", "uuid1");
+        eventLogs.add(eventLog);
+
+        when(openMRSWebClient.get(any(URI.class))).thenReturn(new ObjectMapper().writeValueAsString(eventLogs.toArray()));
+        List<EventLog> eventLogsForFilterChange = eventLogFetcher.fetchEventLogsForFilterChange(eventRecordUuids);
+
+        Assert.assertEquals(eventLogs.size(),eventLogsForFilterChange.size());
+        Assert.assertEquals(eventLogs.get(0).getUuid(),eventLogsForFilterChange.get(0).getUuid());
     }
 
 }

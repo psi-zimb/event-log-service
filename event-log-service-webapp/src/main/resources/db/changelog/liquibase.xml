@@ -41,4 +41,18 @@
         </sql>
     </changeSet>
 
+    <changeSet id="201610171447" author="Ujjawala / ShruthiP">
+        <comment>Add column to event_log table</comment>
+        <sql>
+           alter table event_log add column parent_uuid varchar(40);
+        </sql>
+    </changeSet>
+
+    <changeSet id="201610171458" author="Ujjawala / ShruthiP">
+        <comment>update parent_uuid column</comment>
+        <sql>
+           update event_log set parent_uuid = uuid;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
