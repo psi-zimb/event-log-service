@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/rest/eventlog")
@@ -23,44 +21,59 @@ public class EventLogController {
     }
 
     @RequestMapping(value = "/events", method = RequestMethod.GET)
-    public List<EventLog> getEvents(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = true) String[] filterBy) {
+    public Map<String, Object> getEvents(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = true) String[] filterBy) {
         List<String> categoryList = new ArrayList<String>();
+        Map<String,Object> response = new HashMap();
         categoryList.add("addressHierarchy");
         if (uuid == null) {
-            return eventLogRepository.findTop100ByFilterInAndCategoryNotIn(Arrays.asList(filterBy), categoryList);
+             response.put("events",eventLogRepository.findTop100ByFilterInAndCategoryNotIn(Arrays.asList(filterBy), categoryList));
+             response.put("pendingEventsCount", eventLogRepository.countByFilterInAndCategoryNotIn(Arrays.asList(filterBy), categoryList));
         }
-        EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
-
-        return eventLogRepository.findTop100ByFilterInAndIdAfterAndCategoryNotIn( Arrays.asList(filterBy), lastReadEventLog.getId(), categoryList);
+        else {
+            EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
+            response.put("events", eventLogRepository.findTop100ByFilterInAndIdAfterAndCategoryNotIn(Arrays.asList(filterBy), lastReadEventLog.getId(), categoryList));
+            response.put("pendingEventsCount", eventLogRepository.countByFilterInAndIdAfterAndCategoryNotIn(Arrays.asList(filterBy), lastReadEventLog.getId(), categoryList));
+        }
+        return response;
     }
 
     @RequestMapping(value = "/getAddressHierarchyEvents", method = RequestMethod.GET)
-        public List<EventLog> getAddressHierarchyEvents(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = false) String[] filterBy) {
+        public Map<String, Object> getAddressHierarchyEvents(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = false) String[] filterBy) {
         if(filterBy != null && filterBy.length > 1){
             throw new RuntimeException("Address hierarchy events should have only one filter!!");
         }
+        Map<String,Object> response = new HashMap();
         if (filterBy == null && uuid == null) {
-            return eventLogRepository.findTop100ByCategoryAndFilterIsNull("addressHierarchy");
+            response.put("events",eventLogRepository.findTop100ByCategoryAndFilterIsNull("addressHierarchy"));
+            response.put("pendingEventsCount", eventLogRepository.countByCategoryAndFilterIsNull("addressHierarchy"));
         }else if (filterBy == null){
             EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
-            return  eventLogRepository.findTop100ByCategoryAndIdAfterAndFilterIsNull("addressHierarchy", lastReadEventLog.getId());
+            response.put("events",eventLogRepository.findTop100ByCategoryAndIdAfterAndFilterIsNull("addressHierarchy", lastReadEventLog.getId()));
+            response.put("pendingEventsCount",eventLogRepository.countByCategoryAndIdAfterAndFilterIsNull("addressHierarchy", lastReadEventLog.getId()));
         }else if (uuid == null){
-            return  eventLogRepository.findTop100ByCategoryAndFilterStartingWith("addressHierarchy", filterBy[0]);
+            response.put("events",eventLogRepository.findTop100ByCategoryAndFilterStartingWith("addressHierarchy", filterBy[0]));
+            response.put("pendingEventsCount",eventLogRepository.countByCategoryAndFilterStartingWith("addressHierarchy", filterBy[0]));
         }else{
             EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
-            return  eventLogRepository.findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy[0], lastReadEventLog.getId());
+            response.put("events",eventLogRepository.findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy[0], lastReadEventLog.getId()));
+            response.put("pendingEventsCount",eventLogRepository.countByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy[0], lastReadEventLog.getId()));
         }
+        return response;
     }
 
     @RequestMapping(value = "/concepts", method = RequestMethod.GET)
-    public List<EventLog> getConcepts(@RequestParam(value = "uuid", required = false) String uuid) {
-
+    public Map<String, Object> getConcepts(@RequestParam(value = "uuid", required = false) String uuid) {
+        Map<String,Object> response = new HashMap();
         if (uuid == null) {
-            return eventLogRepository.findTop100ByCategoryIs("offline-concepts");
+            response.put("events", eventLogRepository.findTop100ByCategoryIs("offline-concepts"));
+            response.put("pendingEventsCount", eventLogRepository.countByCategoryIs("offline-concepts"));
         }
-        EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
-        return eventLogRepository.findTop100ByCategoryIsAndIdAfter("offline-concepts", lastReadEventLog.getId());
+        else {
+            EventLog lastReadEventLog = eventLogRepository.findTop1ByUuid(uuid);
+            response.put("events", eventLogRepository.findTop100ByCategoryIsAndIdAfter("offline-concepts", lastReadEventLog.getId()));
+            response.put("pendingEventsCount", eventLogRepository.countByCategoryIsAndIdAfter("offline-concepts", lastReadEventLog.getId()));
+        }
+        return response;
     }
-
 
 }

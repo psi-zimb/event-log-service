@@ -35,4 +35,21 @@ public interface EventLogRepository extends JpaRepository<EventLog, Integer> {
     EventLog findTop1ByCategoryAndObjectOrderByIdDesc(@Param("category") String category,@Param("object") String object);
 
     EventLog findFirstByOrderByIdDesc();
+
+    Integer countByFilterInAndCategoryNotIn(@Param("filter") List<String> filter, @Param("category") List<String> categoryList);
+
+    Integer countByFilterInAndIdAfterAndCategoryNotIn(@Param("filter") List<String> filter, @Param("id") Integer id,
+                                                      @Param("category") List<String> categoryList);
+
+    Integer countByCategoryAndFilterIsNull(@Param("category") String category);
+
+    Integer countByCategoryAndIdAfterAndFilterIsNull(@Param("category") String category, @Param("id") Integer lastReadEventLogId);
+
+    Integer countByCategoryAndFilterStartingWith(@Param("category") String category, @Param("filter") String filter);
+
+    Integer countByCategoryAndFilterStartingWithAndIdAfter(@Param("category") String category, @Param("filter") String filter,  @Param("id") Integer lastReadEventLogId);
+
+    Integer countByCategoryIsAndIdAfter(@Param("category") String category, @Param("id") Integer lastReadEventLogId);
+
+    Integer countByCategoryIs(@Param("category")String category);
 }

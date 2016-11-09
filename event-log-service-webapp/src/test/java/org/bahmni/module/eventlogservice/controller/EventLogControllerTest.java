@@ -9,7 +9,9 @@ import org.mockito.Mock;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -40,14 +42,18 @@ public class EventLogControllerTest {
         lastReadEventLog.setId(1000);
         when(eventLogRepository.findTop1ByUuid(uuid)).thenReturn(lastReadEventLog);
         when(eventLogRepository.findTop100ByFilterInAndIdAfterAndCategoryNotIn(filtersList, lastReadEventLog.getId(), categoryList)).thenReturn(eventLogs);
+        when(eventLogRepository.countByFilterInAndIdAfterAndCategoryNotIn(filtersList, lastReadEventLog.getId(), categoryList)).thenReturn(1);
 
-        List<EventLog> events = eventLogController.getEvents(uuid, filterBy);
-
+        Map<String, Object> response = eventLogController.getEvents(uuid, filterBy);
+        List<EventLog> events = (List<EventLog>) response.get("events");
+        Integer pendingEventsCount = (Integer) response.get("pendingEventsCount");
 
         verify(eventLogRepository, times(1)).findTop1ByUuid(uuid);
         verify(eventLogRepository, times(1)).findTop100ByFilterInAndIdAfterAndCategoryNotIn(filtersList, lastReadEventLog.getId(), categoryList);
         verify(eventLogRepository, never()).findTop100ByFilterInAndCategoryNotIn(any(List.class), anyList());
+        verify(eventLogRepository,times(1)).countByFilterInAndIdAfterAndCategoryNotIn(filtersList, lastReadEventLog.getId(), categoryList);
         assertNotNull(events);
+        assertEquals(1,pendingEventsCount.intValue());
     }
 
     @Test
@@ -59,14 +65,18 @@ public class EventLogControllerTest {
         lastReadEventLog.setId(1000);
         when(eventLogRepository.findTop1ByUuid(uuid)).thenReturn(lastReadEventLog);
         when(eventLogRepository.findTop100ByCategoryIsAndIdAfter(category, lastReadEventLog.getId())).thenReturn(eventLogs);
-
-        List<EventLog> concepts = eventLogController.getConcepts(uuid);
+        when(eventLogRepository.countByCategoryIsAndIdAfter(category,lastReadEventLog.getId())).thenReturn(10);
+        Map<String,Object> response = eventLogController.getConcepts(uuid);
+        List<EventLog> concepts = (List<EventLog>) response.get("events");
+        Integer pendingEventsCount = (Integer) response.get("pendingEventsCount");
 
 
         verify(eventLogRepository, times(1)).findTop1ByUuid(uuid);
         verify(eventLogRepository, times(1)).findTop100ByCategoryIsAndIdAfter(category, lastReadEventLog.getId());
         verify(eventLogRepository, never()).findTop100ByCategoryIs(anyString());
         assertNotNull(concepts);
+        verify(eventLogRepository, times(1)).countByCategoryIsAndIdAfter(category,lastReadEventLog.getId());
+        assertEquals(10, pendingEventsCount.intValue());
     }
 
     @Test
@@ -77,14 +87,18 @@ public class EventLogControllerTest {
         categoryList.add("addressHierarchy");
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         when(eventLogRepository.findTop100ByFilterInAndCategoryNotIn(filtersList, categoryList)).thenReturn(eventLogs);
+        when(eventLogRepository.countByFilterInAndCategoryNotIn(filtersList, categoryList)).thenReturn(1);
 
-        List<EventLog> events = eventLogController.getEvents(null, filterBy);
+        Map<String, Object> response = eventLogController.getEvents(null, filterBy);
+        List<EventLog> events = (List<EventLog>) response.get("events");
+        Integer pendingEventsCount = (Integer) response.get("pendingEventsCount");
 
 
         verify(eventLogRepository, times(1)).findTop100ByFilterInAndCategoryNotIn(filtersList, categoryList);
         verify(eventLogRepository, never()).findTop1ByUuid(anyString());
         verify(eventLogRepository, never()).findTop100ByFilterInAndIdAfterAndCategoryNotIn(any(List.class), anyInt(), anyList());
         assertNotNull(events);
+        assertEquals(1,pendingEventsCount.intValue());
     }
 
 
@@ -95,17 +109,25 @@ public class EventLogControllerTest {
         EventLog lastReadEventLog = new EventLog();
         lastReadEventLog.setId(1000);
         when(eventLogRepository.findTop1ByUuid(uuid)).thenReturn(lastReadEventLog);
-        when(eventLogRepository.findTop100ByCategoryAndFilterIsNull("addressHierarchy")).thenReturn(eventLogs);
+        when(eventLogRepository.findTop100ByCategoryAndIdAfterAndFilterIsNull("addressHierarchy", lastReadEventLog.getId())).thenReturn(eventLogs);
+        when(eventLogRepository.countByCategoryAndIdAfterAndFilterIsNull("addressHierarchy", lastReadEventLog.getId())).thenReturn(1);
 
-        List<EventLog> events = eventLogController.getAddressHierarchyEvents(uuid, null);
+        Map<String, Object> response = eventLogController.getAddressHierarchyEvents(uuid, null);
+        List<EventLog> events = (List<EventLog>) response.get("events");
+        Integer pendingEventsCount = (Integer) response.get("pendingEventsCount");
 
         verify(eventLogRepository, times(1)).findTop1ByUuid(uuid);
         verify(eventLogRepository, times(1)).findTop100ByCategoryAndIdAfterAndFilterIsNull("addressHierarchy", lastReadEventLog.getId());
+        verify(eventLogRepository, times(1)).countByCategoryAndIdAfterAndFilterIsNull("addressHierarchy", lastReadEventLog.getId());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterIsNull(anyString());
+        verify(eventLogRepository, never()).countByCategoryAndFilterIsNull(anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterStartingWith(anyString(), anyString());
+        verify(eventLogRepository, never()).countByCategoryAndFilterStartingWith(anyString(), anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryAndFilterStartingWithAndIdAfter(anyString(), anyString(), anyInt());
+        verify(eventLogRepository, never()).countByCategoryAndFilterStartingWithAndIdAfter(anyString(), anyString(), anyInt());
 
         assertNotNull(events);
+        assertEquals(1, pendingEventsCount.intValue());
     }
 
     @Test
@@ -113,8 +135,8 @@ public class EventLogControllerTest {
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         when(eventLogRepository.findTop100ByCategoryAndFilterIsNull("addressHierarchy")).thenReturn(eventLogs);
 
-        List<EventLog> events = eventLogController.getAddressHierarchyEvents(null, null);
-
+        Map<String, Object> response = eventLogController.getAddressHierarchyEvents(null, null);
+        List<EventLog> events = (List<EventLog>) response.get("events");
         verify(eventLogRepository, times(1)).findTop100ByCategoryAndFilterIsNull("addressHierarchy");
         verify(eventLogRepository, never()).findTop1ByUuid(anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryAndIdAfterAndFilterIsNull(anyString(), anyInt());
@@ -134,7 +156,8 @@ public class EventLogControllerTest {
         when(eventLogRepository.findTop1ByUuid(uuid)).thenReturn(lastReadEventLog);
         when(eventLogRepository.findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy[0], lastReadEventLog.getId())).thenReturn(eventLogs);
 
-        List<EventLog> events = eventLogController.getAddressHierarchyEvents(uuid, filterBy);
+        Map<String, Object> response = eventLogController.getAddressHierarchyEvents(uuid, filterBy);
+        List<EventLog> events = (List<EventLog>) response.get("events");
 
         verify(eventLogRepository, times(1)).findTop1ByUuid(uuid);
         verify(eventLogRepository, times(1)).findTop100ByCategoryAndFilterStartingWithAndIdAfter("addressHierarchy", filterBy[0], lastReadEventLog.getId());
@@ -153,7 +176,8 @@ public class EventLogControllerTest {
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         when(eventLogRepository.findTop100ByCategoryAndFilterStartingWith("addressHierarchy", filterBy)).thenReturn(eventLogs);
 
-        List<EventLog> events = eventLogController.getAddressHierarchyEvents(null, filters);
+        Map<String, Object> response = eventLogController.getAddressHierarchyEvents(null, filters);
+        List<EventLog> events = (List<EventLog>) response.get("events");
 
         verify(eventLogRepository, times(1)).findTop100ByCategoryAndFilterStartingWith("addressHierarchy", filterBy);
         verify(eventLogRepository, never()).findTop1ByUuid(anyString());
@@ -169,17 +193,22 @@ public class EventLogControllerTest {
         String category = "offline-concepts";
         ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
         when(eventLogRepository.findTop100ByCategoryIs(category)).thenReturn(eventLogs);
+        when(eventLogRepository.countByCategoryIs(category)).thenReturn(110);
 
-        List<EventLog> events = eventLogController.getConcepts(null);
+        Map<String, Object> response = eventLogController.getConcepts(null);
+        List<EventLog> events = (List<EventLog>) response.get("events");
+        Integer pendingEventsCount = (Integer) response.get("pendingEventsCount");
 
 
         verify(eventLogRepository, times(1)).findTop100ByCategoryIs(category);
         verify(eventLogRepository, never()).findTop1ByUuid(anyString());
         verify(eventLogRepository, never()).findTop100ByCategoryIsAndIdAfter(anyString(), anyInt());
         assertNotNull(events);
+        verify(eventLogRepository, times(1)).countByCategoryIs(category);
+        assertEquals(110, pendingEventsCount.intValue());
     }
     @Test(expected = RuntimeException.class)
     public void shouldThrowExceptionWhenFilterByHasMultipleFilters() throws Exception {
-        List<EventLog> events = eventLogController.getAddressHierarchyEvents("uuid3", new String[]{"2020", "202020"});
+        eventLogController.getAddressHierarchyEvents("uuid3", new String[]{"2020", "202020"});
     }
 }
