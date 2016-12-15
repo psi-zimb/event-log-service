@@ -79,14 +79,14 @@
                 <updatePolicy>interval:10080</updatePolicy>
             </snapshots>
         </repository>
-        <repository>
-            <id>bahmni-artifactory</id>
-            <name>bahmni-artifactory-snapshots</name>
-            <url>http://bahmnirepo.thoughtworks.com/artifactory/libs-snapshot-local</url>
-            <snapshots>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
+       <repository>
+           <id>repo.mybahmni.org</id>
+           <name>bahmni-artifactory-snapshots</name>
+           <url>s3://repo.mybahmni.org/artifactory/snapshot</url>
+           <snapshots>
+               <updatePolicy>always</updatePolicy>
+           </snapshots>
+       </repository>
         <repository>
             <id>openmrs-repo-modules</id>
             <name>Modules</name>
