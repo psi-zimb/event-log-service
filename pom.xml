@@ -80,9 +80,9 @@
             </snapshots>
         </repository>
         <repository>
-            <id>bahmni-artifactory</id>
+            <id>repo.mybahmni.org</id>
             <name>bahmni-artifactory-snapshots</name>
-            <url>http://bahmnirepo.thoughtworks.com/artifactory/libs-snapshot-local</url>
+            <url>http://repo.mybahmni.org.s3.amazonaws.com/artifactory/snapshot</url>
             <snapshots>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
