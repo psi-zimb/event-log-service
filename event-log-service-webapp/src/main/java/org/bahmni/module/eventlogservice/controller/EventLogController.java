@@ -3,10 +3,7 @@ package org.bahmni.module.eventlogservice.controller;
 import org.bahmni.module.eventlogservice.model.EventLog;
 import org.bahmni.module.eventlogservice.repository.EventLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -20,11 +17,16 @@ public class EventLogController {
         this.eventLogRepository = eventLogRepository;
     }
 
-    @RequestMapping(value = "/events", method = RequestMethod.GET)
-    public Map<String, Object> getEvents(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = true) String[] filterBy) {
+    @RequestMapping(value = "/events/{category}", method = RequestMethod.GET)
+    public Map<String, Object> getEvents(@PathVariable String category, @RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = true) String[] filterBy) {
         List<String> categoryList = new ArrayList<String>();
-        Map<String,Object> response = new HashMap();
         categoryList.add("addressHierarchy");
+        categoryList.add("patient".equals(category) ? "Encounter" : "patient");
+        return getEventsExcept(uuid, filterBy, categoryList);
+    }
+
+    private Map<String, Object> getEventsExcept(@RequestParam(value = "uuid", required = false) String uuid, @RequestParam(value = "filterBy", required = true) String[] filterBy, List<String> categoryList) {
+        Map<String,Object> response = new HashMap();
         if (uuid == null) {
              response.put("events",eventLogRepository.findTop100ByFilterInAndCategoryNotIn(Arrays.asList(filterBy), categoryList));
              response.put("pendingEventsCount", eventLogRepository.countByFilterInAndCategoryNotIn(Arrays.asList(filterBy), categoryList));

@@ -22,12 +22,26 @@ public class EventLogControllerIT extends BaseIntegrationTest {
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
     })
     @Test
-    public void shouldGetAllEventLogsByFilterInAndCategoryNotIn() throws Exception {
+    public void shouldGetAllEncounterEventLogsByFilterInAndCategoryNotIn() throws Exception {
 
-        Map<String,Object> response = eventLogController.getEvents(null, new String[]{"2020","202020"});
+        Map<String, Object> response = eventLogController.getEvents("encounter", null, new String[]{"2020", "202020"});
 
         assertNotNull(response);
-        assertEquals(3, ((List)response.get("events")).size());
+        assertEquals(1, ((List) response.get("events")).size());
+        assertEquals(1, response.get("pendingEventsCount"));
+    }
+
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:testDataSet/eventLogController/insertEventLogs.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
+    })
+    @Test
+    public void shouldGetAllPatientEventLogsByFilterInAndCategoryNotIn() throws Exception {
+
+        Map<String, Object> response = eventLogController.getEvents("patient", null, new String[]{"2020", "202020"});
+
+        assertNotNull(response);
+        assertEquals(3, ((List) response.get("events")).size());
         assertEquals(3, response.get("pendingEventsCount"));
     }
 
@@ -36,15 +50,31 @@ public class EventLogControllerIT extends BaseIntegrationTest {
             @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
     })
     @Test
-    public void shouldGetAllEventsAfterUuidAndByFilterInAndCategoryNotIn() throws Exception {
-        Map<String,Object> response = eventLogController.getEvents("uuid8", new String[]{"2020","202020"});
+    public void shouldGetAllEncounterEventsAfterUuidAndByFilterInAndCategoryNotIn() throws Exception {
+        Map<String, Object> response = eventLogController.getEvents("encounter", "uuid11", new String[]{"2020", "202020"});
 
         assertNotNull(response);
-        List<EventLog> events = (List<EventLog>)response.get("events");
+        List<EventLog> events = (List<EventLog>) response.get("events");
+
+        assertNotNull(events);
+        assertEquals(0, events.size());
+        assertEquals(0, response.get("pendingEventsCount"));
+    }
+
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:testDataSet/eventLogController/insertEventLogs.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
+    })
+    @Test
+    public void shouldGetAllPatientEventsAfterUuidAndByFilterInAndCategoryNotIn() throws Exception {
+        Map<String, Object> response = eventLogController.getEvents("patient", "uuid8", new String[]{"2020", "202020"});
+
+        assertNotNull(response);
+        List<EventLog> events = (List<EventLog>) response.get("events");
 
         assertNotNull(events);
         assertEquals(2, events.size());
-        assertEquals(2,response.get("pendingEventsCount"));
+        assertEquals(2, response.get("pendingEventsCount"));
     }
 
     @SqlGroup({
@@ -58,7 +88,7 @@ public class EventLogControllerIT extends BaseIntegrationTest {
 
         assertNotNull(events);
         assertEquals(2, events.size());
-        assertEquals(2,response.get("pendingEventsCount"));
+        assertEquals(2, response.get("pendingEventsCount"));
     }
 
 
@@ -73,7 +103,7 @@ public class EventLogControllerIT extends BaseIntegrationTest {
 
         assertNotNull(events);
         assertEquals(1, events.size());
-        assertEquals(1,response.get("pendingEventsCount"));
+        assertEquals(1, response.get("pendingEventsCount"));
     }
 
 
@@ -87,7 +117,7 @@ public class EventLogControllerIT extends BaseIntegrationTest {
         List<EventLog> events = (List<EventLog>) response.get("events");
         assertNotNull(events);
         assertEquals(5, events.size());
-        assertEquals(5,response.get("pendingEventsCount"));
+        assertEquals(5, response.get("pendingEventsCount"));
     }
 
 
@@ -117,7 +147,7 @@ public class EventLogControllerIT extends BaseIntegrationTest {
 
         assertNotNull(events);
         assertEquals(2, events.size());
-        assertEquals(2,response.get("pendingEventsCount"));
+        assertEquals(2, response.get("pendingEventsCount"));
     }
 
     @SqlGroup({
@@ -126,7 +156,7 @@ public class EventLogControllerIT extends BaseIntegrationTest {
     })
     @Test
     public void shouldGetAllConceptEventsAfterUuidAndByCategoryStartingWith() throws Exception {
-        Map<String,Object> response = eventLogController.getConcepts("conceptUuid1");
+        Map<String, Object> response = eventLogController.getConcepts("conceptUuid1");
         List<EventLog> events = (List<EventLog>) response.get("events");
         Integer pendingEventsCount = (Integer) response.get("pendingEventsCount");
 
@@ -143,6 +173,6 @@ public class EventLogControllerIT extends BaseIntegrationTest {
     @Test(expected = RuntimeException.class)
     public void shouldThrowExceptionWhenFilterByHasMultipleFilters() throws Exception {
         eventLogController.getAddressHierarchyEvents("uuid3", new String[]{"2020", "202020"});
-       }
+    }
 
 }

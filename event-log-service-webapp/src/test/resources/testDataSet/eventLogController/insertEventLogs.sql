@@ -8,3 +8,4 @@ INSERT INTO event_log (id, uuid,timestamp,filter,object,category) values (7, 'uu
 INSERT INTO event_log (id, uuid,timestamp,filter,object,category) values (8, 'uuid8', '2015-08-14 12:36:22.0', '202020', 'url to get data', 'patient');
 INSERT INTO event_log (id, uuid,timestamp,filter,object,category) values (9, 'uuid9', '2015-08-14 12:36:22.0', '202020', 'url to get data', 'patient');
 INSERT INTO event_log (id, uuid,timestamp,filter,object,category) values (10, 'uuid10', '2015-08-14 12:36:22.0', '202020', 'url to get data', 'patient');
+INSERT INTO event_log (id, uuid,timestamp,filter,object,category) values (11, 'uuid11', '2015-08-14 12:36:22.0', '202020', 'url to get data', 'Encounter');
