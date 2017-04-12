@@ -46,9 +46,8 @@ public class EventLogPublisherJob implements Job {
             for(EventLog event : eventLogs){
             if(event.getCategory().equals("patient")){
                   EventLog recentPatientEvent = eventLogRepository.findTop1ByCategoryAndObjectOrderByIdDesc(event.getCategory(),event.getObject());
-                if(recentPatientEvent != null && !recentPatientEvent.getFilter().equals(event.getFilter()))
+                if(requiredNewFilter(event, recentPatientEvent))
                     eventRecordUuidsWithNewFilter.put(event.getParentUuid(),event);
-
             }
         }
 
@@ -66,5 +65,13 @@ public class EventLogPublisherJob implements Job {
         }
         eventLogRepository.save(eventLogs);
         logger.debug("Copied " + eventLogs.size() + " events to events_log table");
+    }
+
+    private boolean requiredNewFilter(EventLog event, EventLog recentPatientEvent) {
+        if (recentPatientEvent == null)
+            return false;
+        if (recentPatientEvent.getFilter() == null || event.getFilter() == null)
+            return true;
+        return !recentPatientEvent.getFilter().equals(event.getFilter());
     }
 }
