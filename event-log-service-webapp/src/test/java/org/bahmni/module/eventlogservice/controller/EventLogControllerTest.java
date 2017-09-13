@@ -261,6 +261,48 @@ public class EventLogControllerTest {
         assertEquals(110, pendingEventsCount.intValue());
     }
 
+    @Test
+    public void shouldGetAllFormEventsForTheFirstTime() throws Exception {
+        String category = "forms";
+        ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
+        when(eventLogRepository.findTop100ByCategoryIs(category)).thenReturn(eventLogs);
+        when(eventLogRepository.countByCategoryIs(category)).thenReturn(110);
+
+        Map<String, Object> response = eventLogController.getForms(null);
+        List<EventLog> events = (List<EventLog>) response.get("events");
+        Integer pendingEventsCount = (Integer) response.get("pendingEventsCount");
+
+        verify(eventLogRepository, times(1)).findTop100ByCategoryIs(category);
+        verify(eventLogRepository, never()).findTop1ByUuid(anyString());
+        verify(eventLogRepository, never()).findTop100ByCategoryIsAndIdAfter(anyString(), anyInt());
+        assertNotNull(events);
+        verify(eventLogRepository, times(1)).countByCategoryIs(category);
+        assertEquals(110, pendingEventsCount.intValue());
+    }
+
+    @Test
+    public void shouldGetFormEventLog() throws Exception {
+        String uuid = "uuid1";
+        String category = "forms";
+        ArrayList<EventLog> eventLogs = new ArrayList<EventLog>();
+        EventLog lastReadEventLog = new EventLog();
+        lastReadEventLog.setId(1000);
+        when(eventLogRepository.findTop1ByUuid(uuid)).thenReturn(lastReadEventLog);
+        when(eventLogRepository.findTop100ByCategoryIsAndIdAfter(category, lastReadEventLog.getId())).thenReturn(eventLogs);
+        when(eventLogRepository.countByCategoryIsAndIdAfter(category, lastReadEventLog.getId())).thenReturn(10);
+        Map<String, Object> response = eventLogController.getForms(uuid);
+        List<EventLog> concepts = (List<EventLog>) response.get("events");
+        Integer pendingEventsCount = (Integer) response.get("pendingEventsCount");
+
+
+        verify(eventLogRepository, times(1)).findTop1ByUuid(uuid);
+        verify(eventLogRepository, times(1)).findTop100ByCategoryIsAndIdAfter(category, lastReadEventLog.getId());
+        verify(eventLogRepository, never()).findTop100ByCategoryIs(anyString());
+        assertNotNull(concepts);
+        verify(eventLogRepository, times(1)).countByCategoryIsAndIdAfter(category, lastReadEventLog.getId());
+        assertEquals(10, pendingEventsCount.intValue());
+    }
+
     @Test(expected = RuntimeException.class)
     public void shouldThrowExceptionWhenFilterByHasMultipleFilters() throws Exception {
         eventLogController.getAddressHierarchyEvents("uuid3", new String[]{"2020", "202020"});

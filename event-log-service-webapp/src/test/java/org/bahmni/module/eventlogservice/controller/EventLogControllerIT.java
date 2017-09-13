@@ -175,4 +175,36 @@ public class EventLogControllerIT extends BaseIntegrationTest {
         eventLogController.getAddressHierarchyEvents("uuid3", new String[]{"2020", "202020"});
     }
 
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:testDataSet/eventLogController/insertFormEventLogs.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
+    })
+    @Test
+    public void shouldGetAllFormEventLogs() throws Exception {
+        Map<String, Object> response = eventLogController.getForms(null);
+        List<EventLog> events = (List<EventLog>) response.get("events");
+        Integer pendingEventsCount = (Integer) response.get("pendingEventsCount");
+
+        assertNotNull(events);
+        assertEquals(4, events.size());
+        assertEquals(4, pendingEventsCount.intValue());
+    }
+
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:testDataSet/eventLogController/insertFormEventLogs.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:testDataSet/truncateTables.sql")
+    })
+    @Test
+    public void shouldGetRemainingFormEventLogs() throws Exception {
+        Map<String, Object> response = eventLogController.getForms("formUuid3");
+        List<EventLog> events = (List<EventLog>) response.get("events");
+        Integer pendingEventsCount = (Integer) response.get("pendingEventsCount");
+
+        assertNotNull(events);
+        assertEquals(1, events.size());
+        assertEquals(1, pendingEventsCount.intValue());
+        assertEquals("formUuid4", events.get(0).getUuid());
+    }
+
+
 }
