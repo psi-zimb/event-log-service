@@ -1,15 +1,33 @@
 import MySQLdb
 import uuid
 import datetime
+import os
+import getpass
 
-db = MySQLdb.connect("localhost","root","password","openmrs")
+
+mySqlPswd = os.environ.get('MYSQL_ROOT_PASSWORD');
+
+if 'None' == str(mySqlPswd) or '' == str(mySqlPswd):
+    try:
+       mySqlUser = raw_input('MySQL user: ')
+       mySqlPswd = getpass.getpass(prompt='MySQL password: ')
+    except Exception as error:
+       print 'ERROR: '+ error;
+    else:
+       print 'MySQL user: '+ mySqlUser
+       print 'MySQL password: '+ mySqlPswd;
+else:
+    mySqlUser = 'root'
+    print 'MySQL user root with password '+ mySqlPswd;
+
+db = MySQLdb.connect("localhost",mySqlUser,mySqlPswd,"openmrs")
 cursor = db.cursor()
 
 datetimenow = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'));
 
 sql = "select DISTINCT concept_id from concept_name where name = 'Offline Concepts'"
 def isOfflineConceptsAlreadyPresent( sql ):
-    db = MySQLdb.connect("localhost","root","password","openmrs")
+    db = MySQLdb.connect("localhost",mySqlUser,mySqlPswd,"openmrs")
     cursor = db.cursor()
     try:
         cursor.execute(sql)
@@ -29,7 +47,7 @@ if isOfflineConceptsAlreadyPresent(sql) == 0:
     insertConcept = "INSERT into concept (retired, datatype_id, class_id, is_set, creator, date_created, uuid) VALUES (0,1,10,1,1,'"+ datetimenow +"', '" + conceptUuid + "');"
     getConceptId = "SELECT concept_id from concept where uuid = '" + conceptUuid + "'";
 
-    db = MySQLdb.connect("localhost","root","password","openmrs")
+    db = MySQLdb.connect("localhost",mySqlUser,mySqlPswd,"openmrs")
     cursor = db.cursor()
     try:
         cursor.execute(insertConcept)
@@ -45,7 +63,7 @@ if isOfflineConceptsAlreadyPresent(sql) == 0:
         print ""
     db.close()
 else:
-    db = MySQLdb.connect("localhost","root","password","openmrs")
+    db = MySQLdb.connect("localhost",mySqlUser,mySqlPswd,"openmrs")
     cursor = db.cursor()
     try:
         cursor.execute(sql)
@@ -58,7 +76,7 @@ else:
 
 
 def insertConceptToOfflineConcepts( conceptId, conceptUuid, conceptName ):
-    db = MySQLdb.connect("localhost","root","password","openmrs")
+    db = MySQLdb.connect("localhost",mySqlUser,mySqlPswd,"openmrs")
     cursor = db.cursor()
     query = "select count(concept_set_id) from concept_set where concept_id = "+ str(conceptId) + " and concept_set = " + offlineConceptSetId;
     cursor.execute(query)
@@ -80,7 +98,7 @@ def insertConceptToOfflineConcepts( conceptId, conceptUuid, conceptName ):
 concepts = []
 
 def getAllConcepts(conceptId) :
-    db = MySQLdb.connect("localhost","root","password","openmrs")
+    db = MySQLdb.connect("localhost",mySqlUser,mySqlPswd,"openmrs")
     cursor = db.cursor()
     query = "select concept_id from concept_set where concept_set = "+str(conceptId)+";"
     try:
@@ -95,7 +113,7 @@ def getAllConcepts(conceptId) :
 def getConceptDetails(conceptId) :
     conceptDetails = []
     query = "select c.uuid, cn.name from concept c, concept_name cn where c.concept_id = cn.concept_id and cn.concept_name_type = 'FULLY_SPECIFIED' and c.concept_id = "+str(conceptId)+";"
-    db = MySQLdb.connect("localhost","root","password","openmrs")
+    db = MySQLdb.connect("localhost",mySqlUser,mySqlPswd,"openmrs")
     cursor = db.cursor()
     try:
         cursor.execute(query)
@@ -115,7 +133,7 @@ def execute() :
 
 def getAllObsConceptId() :
     query = "select DISTINCT concept_id from concept_name where name = 'All Observation Templates'"
-    db = MySQLdb.connect("localhost","root","password","openmrs")
+    db = MySQLdb.connect("localhost",mySqlUser,mySqlPswd,"openmrs")
     cursor = db.cursor()
     try:
         cursor.execute(query)
