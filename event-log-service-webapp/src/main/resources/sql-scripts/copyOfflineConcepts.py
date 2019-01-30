@@ -5,19 +5,17 @@ import os
 import getpass
 
 
-mySqlPswd = os.environ.get('MYSQL_ROOT_PASSWORD');
+mySqlUser = os.environ.get('MYSQL_USER');
+mySqlPswd = os.environ.get('MYSQL_PASSWORD');
 
-if 'None' == str(mySqlPswd) or '' == str(mySqlPswd):
-    try:
-       mySqlUser = raw_input('MySQL user: ')
-       mySqlPswd = getpass.getpass(prompt='MySQL password: ')
-    except Exception as error:
-       print 'ERROR: '+ error;
-else:
-    mySqlUser = 'root';
+if 'None' == str(mySqlUser) or '' == str(mySqlUser):
+    mySqlUser = raw_input('MySQL user: ')
+    mySqlPswd = getpass.getpass(prompt='MySQL password: ');
+elif 'None' == str(mySqlPswd) or '' == str(mySqlPswd):
+    mySqlPswd = getpass.getpass(prompt='MySQL password: ');
 
-db = MySQLdb.connect("localhost",mySqlUser,mySqlPswd,"openmrs")
-cursor = db.cursor()
+db = MySQLdb.connect("localhost",mySqlUser,mySqlPswd,"openmrs");
+cursor = db.cursor();
 
 datetimenow = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'));
 
