@@ -13,12 +13,8 @@ if 'None' == str(mySqlPswd) or '' == str(mySqlPswd):
        mySqlPswd = getpass.getpass(prompt='MySQL password: ')
     except Exception as error:
        print 'ERROR: '+ error;
-    else:
-       print 'MySQL user: '+ mySqlUser
-       print 'MySQL password: '+ mySqlPswd;
 else:
-    mySqlUser = 'root'
-    print 'MySQL user root with password '+ mySqlPswd;
+    mySqlUser = 'root';
 
 db = MySQLdb.connect("localhost",mySqlUser,mySqlPswd,"openmrs")
 cursor = db.cursor()
